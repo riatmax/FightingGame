@@ -16,7 +16,6 @@ public class GameLoop : MonoBehaviour
     private float _accumulator;
     public int CurrentTick { get; private set; }
 
-
     private void Update()
     {
         _accumulator += Time.deltaTime;
