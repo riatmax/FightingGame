@@ -25,6 +25,8 @@ public class PlayerSpawner : MonoBehaviour
     private PlayerInput[] _joinedPlayers;
     private IDisposable _joinListener;
 
+    [SerializeField] private GameLoop _gameLoop;
+
     private CinemachineTargetGroup _targetGroup;
 
 
@@ -33,7 +35,7 @@ public class PlayerSpawner : MonoBehaviour
         _controls = playerPrefab.GetComponent<PlayerInput>().actions;
         _joinedPlayers = new PlayerInput[InputManager.controlSchemes.Length];
 
-        _targetGroup = GameObject.FindGameObjectWithTag("GroupCam").GetComponent<CinemachineTargetGroup>();
+        _targetGroup = FindFirstObjectByType<CinemachineTargetGroup>(); // changed this line because it found the wrong game object, two different objects were tagged the same 
     }
 
     private void OnEnable()
@@ -81,5 +83,7 @@ public class PlayerSpawner : MonoBehaviour
         _joinedPlayers[schemeIndex] = player;
         
         _targetGroup.AddMember(_joinedPlayers[schemeIndex].transform, 0.5f, 0.5f);
+
+        _gameLoop.RegisterFighter(player.GetComponent<Fighter>());
     }
 }

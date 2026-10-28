@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GameLoop : MonoBehaviour
 {
@@ -15,6 +16,13 @@ public class GameLoop : MonoBehaviour
 
     private float _accumulator;
     public int CurrentTick { get; private set; }
+
+    private readonly List<Fighter> _fighters = new List<Fighter>();
+
+    public void RegisterFighter(Fighter fighter)
+    {
+        _fighters.Add(fighter);
+    }
 
     private void Update()
     {
@@ -37,5 +45,8 @@ public class GameLoop : MonoBehaviour
     private void Tick()
     {
         CurrentTick++;
+
+        foreach (Fighter fighter in _fighters)
+            fighter.Tick();
     }
 }
