@@ -1,14 +1,29 @@
 using UnityEngine;
 
+public enum AttackPhase
+{
+    Startup,
+    Active,
+    Recovery
+}
+
 [CreateAssetMenu(fileName = "NewAttack", menuName = "Fighting Game/Attack Data")]
 public class AttackData : ScriptableObject
 {
-    public int StartupFrames;
-    public int ActiveFrames;
-    public int RecoveryFrames;
+    [SerializeField] private int startupFrames;
+    [SerializeField] private int activeFrames;
+    [SerializeField] private int recoveryFrames;
 
-    public int TotalFrames()
+    public int TotalFrames => startupFrames + activeFrames + recoveryFrames;
+
+    public AttackPhase GetPhase(int frame)
     {
-        return StartupFrames + ActiveFrames + RecoveryFrames;
+        AttackPhase currAttackPhase;
+
+        if (frame < startupFrames) currAttackPhase = AttackPhase.Startup;
+        else if (frame < startupFrames + activeFrames) currAttackPhase = AttackPhase.Active;
+        else currAttackPhase = AttackPhase.Recovery;
+
+        return currAttackPhase;
     }
 }
