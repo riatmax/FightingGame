@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0ae9f07825874b4d97e6e791b1665b5, type: 3}
   m_Name: LightAttack
   m_EditorClassIdentifier: 
-  startupFrames: 0
-  activeFrames: 0
-  recoveryFrames: 0
+  startupFrames: 4
+  activeFrames: 2
+  recoveryFrames: 8
