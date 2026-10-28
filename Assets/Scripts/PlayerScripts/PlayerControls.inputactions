@@ -420,28 +420,6 @@
                     "isOR": false
                 }
             ]
-        },
-        {
-            "name": "P3",
-            "bindingGroup": "P3",
-            "devices": [
-                {
-                    "devicePath": "<Keyboard>",
-                    "isOptional": false,
-                    "isOR": false
-                }
-            ]
-        },
-        {
-            "name": "P4",
-            "bindingGroup": "P4",
-            "devices": [
-                {
-                    "devicePath": "<Keyboard>",
-                    "isOptional": false,
-                    "isOR": false
-                }
-            ]
         }
     ]
 }
