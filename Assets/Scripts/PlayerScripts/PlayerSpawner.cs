@@ -1,4 +1,5 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
@@ -20,18 +21,19 @@ public class PlayerSpawner : MonoBehaviour
     [Header("--- Spawn Settings ---")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform[] spawnPoints;
-
-
-
     private InputActionAsset _controls;
     private PlayerInput[] _joinedPlayers;
     private IDisposable _joinListener;
+
+    private CinemachineTargetGroup _targetGroup;
 
 
     private void Awake()
     {
         _controls = playerPrefab.GetComponent<PlayerInput>().actions;
         _joinedPlayers = new PlayerInput[InputManager.controlSchemes.Length];
+
+        _targetGroup = GameObject.FindGameObjectWithTag("GroupCam").GetComponent<CinemachineTargetGroup>();
     }
 
     private void OnEnable()
@@ -77,5 +79,7 @@ public class PlayerSpawner : MonoBehaviour
         player.transform.SetPositionAndRotation(spawnPoints[schemeIndex].position, spawnPoints[schemeIndex].rotation);
 
         _joinedPlayers[schemeIndex] = player;
+        
+        _targetGroup.AddMember(_joinedPlayers[schemeIndex].transform, 0.5f, 0.5f);
     }
 }
