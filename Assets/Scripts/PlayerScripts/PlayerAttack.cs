@@ -59,7 +59,7 @@ public class PlayerAttack : MonoBehaviour
                 AttackPhase phase = _currAttack.GetPhase(_currFrame);
                 if (phase != _lastPhase)
                 {
-                    Debug.Log(_currAttack.name + ": " + phase + ", currFrame" + _currFrame);
+                    Debug.Log(_currAttack.name + ": " + phase + ", currFrame " + _currFrame);
                     _lastPhase = phase;
                 }
             }
