@@ -261,6 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0f61cfd160f3ba4baf38c63a85b3196, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hurtboxOffset: {x: 0, y: 1}
+  hurtboxSize: {x: 1, y: 2}
 --- !u!1 &8707136150808166439
 GameObject:
   m_ObjectHideFlags: 0

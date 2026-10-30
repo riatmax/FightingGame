@@ -14,6 +14,9 @@ public class AttackData : ScriptableObject
     [SerializeField] private int activeFrames;
     [SerializeField] private int recoveryFrames;
 
+    public Vector2 HitboxOffset;
+    public Vector2 HitboxSize;
+
     public int TotalFrames => startupFrames + activeFrames + recoveryFrames;
 
     public AttackPhase GetPhase(int frame)
