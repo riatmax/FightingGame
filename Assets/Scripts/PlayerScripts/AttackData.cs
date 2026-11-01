@@ -13,8 +13,13 @@ public class AttackData : ScriptableObject
     [SerializeField] private int startupFrames;
     [SerializeField] private int activeFrames;
     [SerializeField] private int recoveryFrames;
+    [SerializeField] private int damage;
+    [Tooltip("How far from the attacker the hit reaches, along the x axis")]
+    [SerializeField] private float range;
 
     public int TotalFrames => startupFrames + activeFrames + recoveryFrames;
+    public int Damage => damage;
+    public float Range => range;
 
     public AttackPhase GetPhase(int frame)
     {

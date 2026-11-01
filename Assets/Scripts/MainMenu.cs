@@ -25,6 +25,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private PlayerSpawner playerSpawner;
     [SerializeField] private GameLoop gameLoop;
     [SerializeField] private GameObject menuRoot;
+    [SerializeField] private GameObject hudRoot;
     [SerializeField] private TMP_Text countdownText;
     [SerializeField] private Button quitButton;
     [SerializeField] private PlayerSlot[] playerSlots;
@@ -65,6 +66,7 @@ public class MainMenu : MonoBehaviour
         yield return new WaitForSeconds(allJoinedDelay);
 
         menuRoot.SetActive(false);
+        hudRoot.SetActive(true);
         countdownText.gameObject.SetActive(true);
 
         for (int i = countdownStart; i > 0; i--)

@@ -107,4 +107,9 @@ public class PlayerSpawner : MonoBehaviour
     {
         return playerColors[playerIndex];
     }
+
+    public Fighter GetFighter(int playerIndex)
+    {
+        return _joinedPlayers[playerIndex].GetComponent<Fighter>();
+    }
 }

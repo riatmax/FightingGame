@@ -306,6 +306,7 @@ GameObject:
   - component: {fileID: 1556060156474411124}
   - component: {fileID: 9215503727532427638}
   - component: {fileID: 7409976705492575445}
+  - component: {fileID: 7305980786623464194}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -408,6 +409,7 @@ MonoBehaviour:
   _attack1Data: {fileID: 11400000, guid: c6adef7d08ca3f644b561c91603197d3, type: 2}
   _attack2Data: {fileID: 11400000, guid: 933afc489503c884d9856f3ad5ed9124, type: 2}
   _attack3Data: {fileID: 11400000, guid: 95c823c15a874af4ab6c4ce0f077517f, type: 2}
+  _debugAttackData: {fileID: 11400000, guid: 8306998e026a47d4aa286da9fb315daa, type: 2}
 --- !u!114 &9215503727532427638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -469,6 +471,19 @@ MonoBehaviour:
   hatRenderers:
   - {fileID: 5177771336861574044}
   - {fileID: 7425630450839236657}
+--- !u!114 &7305980786623464194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8037896197376611390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 692d51deb321c29449c35912e6b8c95b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
 --- !u!1 &8707136150808166439
 GameObject:
   m_ObjectHideFlags: 0
