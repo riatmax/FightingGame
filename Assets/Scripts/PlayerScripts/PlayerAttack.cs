@@ -70,6 +70,9 @@ public class PlayerAttack : MonoBehaviour
                     Debug.Log(_currAttack.name + ": " + phase + ", currFrame " + _currFrame);
                     _lastPhase = phase;
                 }
+
+                if (SFXManager.Instance != null)
+                    SFXManager.Instance.OnAttackFrame(_currAttack, _currFrame);
             }
         }
 
@@ -103,5 +106,8 @@ public class PlayerAttack : MonoBehaviour
         _currAttackHit = false;
         _lastPhase = AttackPhase.Startup;
         Debug.Log(attack.name + ": Started, currFrame " + _currFrame);
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.OnAttackFrame(attack, _currFrame);
     }
 }
