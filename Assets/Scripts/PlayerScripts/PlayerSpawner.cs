@@ -21,13 +21,19 @@ public class PlayerSpawner : MonoBehaviour
     [Header("--- Spawn Settings ---")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform[] spawnPoints;
+    [Tooltip("Hat and menu color for each player, in the same order as the control schemes")]
+    [SerializeField] private Color[] playerColors;
     private InputActionAsset _controls;
     private PlayerInput[] _joinedPlayers;
     private IDisposable _joinListener;
+    private int _joinedCount;
 
     [SerializeField] private GameLoop _gameLoop;
 
     private CinemachineTargetGroup _targetGroup;
+
+    public event Action<int> PlayerJoined;
+    public bool AllPlayersJoined => _joinedCount >= Mathf.Min(spawnPoints.Length, InputManager.controlSchemes.Length);
 
 
     private void Awake()
@@ -80,10 +86,25 @@ public class PlayerSpawner : MonoBehaviour
         player.name = "Player " + (schemeIndex + 1);
         player.transform.SetPositionAndRotation(spawnPoints[schemeIndex].position, spawnPoints[schemeIndex].rotation);
 
+        // Rigidbody has to be moved too - its interpolation overwrites the transform with where it spawned
+        Rigidbody playerRb = player.GetComponent<Rigidbody>();
+        playerRb.position = spawnPoints[schemeIndex].position;
+        playerRb.rotation = spawnPoints[schemeIndex].rotation;
+
         _joinedPlayers[schemeIndex] = player;
         
         _targetGroup.AddMember(_joinedPlayers[schemeIndex].transform, 0.5f, 0.5f);
 
-        _gameLoop.RegisterFighter(player.GetComponent<Fighter>());
+        Fighter fighter = player.GetComponent<Fighter>();
+        fighter.SetHatColor(playerColors[schemeIndex]);
+        _gameLoop.RegisterFighter(fighter);
+
+        _joinedCount++;
+        PlayerJoined?.Invoke(schemeIndex);
+    }
+
+    public Color GetPlayerColor(int playerIndex)
+    {
+        return playerColors[playerIndex];
     }
 }

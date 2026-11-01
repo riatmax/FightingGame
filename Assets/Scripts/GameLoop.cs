@@ -18,14 +18,28 @@ public class GameLoop : MonoBehaviour
     public int CurrentTick { get; private set; }
 
     private readonly List<Fighter> _fighters = new List<Fighter>();
+    private bool _roundStarted;
 
     public void RegisterFighter(Fighter fighter)
     {
         _fighters.Add(fighter);
+        fighter.SetInputEnabled(false);
+    }
+
+    public void StartRound()
+    {
+        _roundStarted = true;
+        _accumulator = 0f;
+        CurrentTick = 0;
+
+        foreach (Fighter fighter in _fighters)
+            fighter.SetInputEnabled(true);
     }
 
     private void Update()
     {
+        if (!_roundStarted) return;
+
         _accumulator += Time.deltaTime;
 
         int ticksThisFrame = 0;
