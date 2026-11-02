@@ -15,14 +15,14 @@ MonoBehaviour:
   startupFrames: 4
   activeFrames: 2
   recoveryFrames: 8
-  damage: 0
-  range: 0
-  sfxPlaylist:
-  - clips:
+  damage: 5
+  hitSFX:
+    clips:
     - {fileID: 8300000, guid: 1a9a8258f9a6ec14095a9ddb8bcd1665, type: 3}
     - {fileID: 8300000, guid: 73329e5210ef02d41934f13c4a8c485e, type: 3}
     - {fileID: 8300000, guid: 666e28743c3782343b856e6a9db6e56a, type: 3}
     - {fileID: 8300000, guid: fc726ea5ec6ec3f4ebd7c61c7c466ba8, type: 3}
     - {fileID: 8300000, guid: 7598b9f7a5eebcd4dbe134fae99d6ead, type: 3}
-    framesAfterStartup: 0
     volume: 1
+  HitboxOffset: {x: 1, y: 1}
+  HitboxSize: {x: 0.8, y: 0.3}
