@@ -123,17 +123,24 @@ public class GameLoop : MonoBehaviour
         foreach (Hit hit in _hits)
         {
             hit.Attacker.PlayerAttack.MarkHit();
-            Debug.Log(hit.Attacker.name + " hit " + hit.Defender.name + " with " + hit.Attack.name + ". Current Tick: " + CurrentTick);
+
+            if (hit.Defender.IsBlocking && !hit.Attack.BreaksBlock)
+            {
+                if (SFXManager.Instance != null)
+                    SFXManager.Instance.PlayDefend();
+
+                Debug.Log(hit.Defender.name + " blocked " + hit.Attacker.name + "'s " + hit.Attack.name + ". Current Tick: " + CurrentTick);
+                continue;
+            }
+
+            hit.Defender.Health.TakeDamage(hit.Attack.Damage);
+
+            if (SFXManager.Instance != null)
+                SFXManager.Instance.PlayAttackHit(hit.Attack);
+
+            Debug.Log(hit.Attacker.name + " hit " + hit.Defender.name + " with " + hit.Attack.name + " for " + hit.Attack.Damage + ". Current Tick: " + CurrentTick);
         }
         _hits.Clear();
-        // After everyone has ticked, so hits on the same tick both land and neither fighter gets priority
-        foreach (Fighter attacker in _fighters)
-        {
-            foreach (Fighter target in _fighters)
-            {
-                if (attacker != target) attacker.TryHit(target);
-            }
-        }
 
         CheckForRoundEnd();
     }

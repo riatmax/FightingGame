@@ -16,11 +16,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [Tooltip("How far left or right the player is allowed to move")]
     [SerializeField] private float maxMove;
+    [Tooltip("Seconds between footstep sounds while walking")]
+    [SerializeField] private float footstepInterval = 0.3f;
     private PlayerInput _thisPlayerInput;
     private InputAction _moveAction;
     private bool _canMove = true;
     private Rigidbody _playerRb;
-    
+    private float _footstepTimer;
+
 
     
     private void Awake()
@@ -46,6 +49,31 @@ public class PlayerMovement : MonoBehaviour
         // if (!_canMove) desiredVelocity = Vector3.zero;
 
         _playerRb.linearVelocity = desiredVelocity;
+
+        UpdateFootsteps(desiredVelocity.x != 0f);
+    }
+
+    // Goes off the input, so backing into the edge of the stage still counts
+    public bool IsWalkingBackward(int facing)
+    {
+        return _moveAction.ReadValue<Vector2>().x * facing < 0f;
+    }
+
+    private void UpdateFootsteps(bool isMoving)
+    {
+        if (!isMoving)
+        {
+            _footstepTimer = 0f;
+            return;
+        }
+
+        _footstepTimer -= Time.fixedDeltaTime;
+        if (_footstepTimer > 0f) return;
+
+        _footstepTimer = footstepInterval;
+
+        if (SFXManager.Instance != null)
+            SFXManager.Instance.PlayFootstep();
     }
 
     // Need to implement at some point, this will likely handle our movement
