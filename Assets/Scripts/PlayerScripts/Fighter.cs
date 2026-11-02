@@ -8,15 +8,32 @@ public class Fighter : MonoBehaviour
 
     [SerializeField] private Renderer[] hatRenderers;
 
+    [Header("--- Model ---")]
+    [Tooltip("The character model, gets turned around whenever Facing changes")]
+    [SerializeField] private Transform visualRoot;
+    [Tooltip("Y rotation that makes the model look to the right")]
+    [SerializeField] private float facingRightYaw = 270f;
+
     [Header("--- Hurtbox ---")]
     [SerializeField] private Vector2 hurtboxOffset;
     [SerializeField] private Vector2 hurtboxSize;
 
     private PlayerInput _playerInput;
+    private int _facing = 1;
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
-    public int Facing { get; set; } = 1;
+    public bool IsBlocking => PlayerMovement.IsWalkingBackward(_facing);
+
+    public int Facing
+    {
+        get => _facing;
+        set
+        {
+            _facing = value;
+            visualRoot.localRotation = Quaternion.Euler(0f, _facing > 0 ? facingRightYaw : facingRightYaw + 180f, 0f);
+        }
+    }
 
     public Rect Hurtbox
     {
@@ -43,11 +60,16 @@ public class Fighter : MonoBehaviour
         PlayerMovement.Tick();
     }
 
-    public void DrawRect(Rect rect)
+    // Depth is only for the gizmo, hits are still checked in 2D. It has to be wider than the
+    // character's body or the box ends up hidden inside it
+    public void DrawBox(Rect rect, float depth)
     {
         Vector3 center = new Vector3(rect.center.x, rect.center.y, transform.position.z);
-        Vector3 size = new Vector3(rect.width, rect.height, 0f);
+        Vector3 size = new Vector3(rect.width, rect.height, depth);
         Gizmos.DrawWireCube(center, size);
+
+        Gizmos.color = new Color(Gizmos.color.r, Gizmos.color.g, Gizmos.color.b, 0.25f);
+        Gizmos.DrawCube(center, size);
     }
 
     private void OnDrawGizmos()
@@ -55,19 +77,13 @@ public class Fighter : MonoBehaviour
         if (!Application.isPlaying) return;
 
         Gizmos.color = Color.green;
-        DrawRect(Hurtbox);
+        DrawBox(Hurtbox, 1.2f);
 
-        if (PlayerAttack.TryGetHitbox(out Rect hitbox))
+        if (PlayerAttack.TryGetActiveHitbox(out Rect hitbox))
         {
             Gizmos.color = Color.red;
-            DrawRect(hitbox);
+            DrawBox(hitbox, 1.3f);
         }
-    }
-
-    public void TryHit(Fighter target)
-    {
-        if (PlayerAttack.TryHit(target.transform.position, out int damage))
-            target.Health.TakeDamage(damage);
     }
 
     public void SetInputEnabled(bool inputEnabled)

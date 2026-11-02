@@ -1,13 +1,52 @@
 using UnityEngine;
 
+[System.Serializable]
+public class SFXGroup
+{
+    [Tooltip("One of these is picked at random each time this group plays")]
+    public AudioClip[] clips;
+    [Range(0f, 1f)] public float volume = 1f;
+
+    [System.NonSerialized] private int _lastIndex = -1;
+
+    public AudioClip GetRandomClip()
+    {
+        if (clips == null || clips.Length == 0) return null;
+        if (clips.Length == 1) return clips[0];
+
+        int index;
+        do
+        {
+            index = Random.Range(0, clips.Length);
+        } while (index == _lastIndex);
+
+        _lastIndex = index;
+        return clips[index];
+    }
+}
+
 [RequireComponent(typeof(AudioSource))]
 public class SFXManager : MonoBehaviour
 {
+    /// <summary>
+    ///
+    ///     Plays every sound effect in the game. Each attack holds its own hit sound in its AttackData,
+    ///     everything shared between attacks lives here
+    ///
+    /// </summary>
+
+
+
     public static SFXManager Instance { get; private set; }
 
-    [Tooltip("Played on the first active frame for any attack with an empty playlist")]
-    [SerializeField] private AudioClip placeholderSFX;
-    [Range(0f, 1f)] [SerializeField] private float placeholderVolume = 1f;
+    [Header("--- Player Sounds ---")]
+    [Tooltip("Plays when an attack's active frames end without hitting anyone")]
+    [SerializeField] private SFXGroup attackWhiff = new SFXGroup();
+    [Tooltip("Plays on top of the attack's own hit sound when a player gets hit")]
+    [SerializeField] private SFXGroup playerHit = new SFXGroup();
+    [SerializeField] private SFXGroup footstep = new SFXGroup();
+    [Tooltip("Plays instead of the hit sounds when a player blocks an attack")]
+    [SerializeField] private SFXGroup defend = new SFXGroup();
 
     private AudioSource audioSource;
 
@@ -25,28 +64,32 @@ public class SFXManager : MonoBehaviour
         audioSource.spatialBlend = 0f;
     }
 
-    public void OnAttackFrame(AttackData attack, int frame)
+    public void PlayAttackHit(AttackData attack)
     {
-        int soundFrame = attack.StartupFrames;
-
-        // No playlist on this attack -> placeholder
-        if (attack.SFXPlaylist.Count == 0)
-        {
-            if (frame == soundFrame) Play(placeholderSFX, placeholderVolume);
-            return;
-        }
-
-        // Otherwise the attack's own playlist decides what plays
-        foreach (AttackSFX sfx in attack.SFXPlaylist)
-        {
-            if (frame == soundFrame + sfx.framesAfterStartup)
-                Play(sfx.GetRandomClip(), sfx.volume);
-        }
+        Play(attack.HitSFX);
+        Play(playerHit);
     }
 
-    private void Play(AudioClip clip, float volume)
+    public void PlayAttackWhiff()
     {
+        Play(attackWhiff);
+    }
+
+    public void PlayFootstep()
+    {
+        Play(footstep);
+    }
+
+    public void PlayDefend()
+    {
+        Play(defend);
+    }
+
+    private void Play(SFXGroup group)
+    {
+        AudioClip clip = group.GetRandomClip();
         if (clip == null) return;
-        audioSource.PlayOneShot(clip, volume);
+
+        audioSource.PlayOneShot(clip, group.volume);
     }
 }

@@ -97,6 +97,7 @@ public class PlayerSpawner : MonoBehaviour
 
         Fighter fighter = player.GetComponent<Fighter>();
         fighter.SetHatColor(playerColors[schemeIndex]);
+        fighter.Facing = spawnPoints[schemeIndex].position.x > 0f ? -1 : 1; // Face the middle of the stage until the round starts tracking the other player
         _gameLoop.RegisterFighter(fighter);
 
         _joinedCount++;
