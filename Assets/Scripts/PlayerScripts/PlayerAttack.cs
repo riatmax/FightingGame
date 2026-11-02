@@ -24,6 +24,7 @@ public class PlayerAttack : MonoBehaviour
     private AttackPhase _lastPhase; // for logging
 
     private Fighter _fighter;
+    private Animator _animator;
 
     public AttackData CurrentAttack => _currAttack;
 
@@ -38,6 +39,7 @@ public class PlayerAttack : MonoBehaviour
         _currAttack = null;
 
         _fighter = GetComponent<Fighter>();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     private void Update()
@@ -60,6 +62,11 @@ public class PlayerAttack : MonoBehaviour
             if (_currFrame >= _currAttack.TotalFrames)
             {
                 Debug.Log(_currAttack.name + ": Finished currFrame " + _currFrame);
+
+                // Has to be fixed time - a normal CrossFade scales with the attack state's speed, which is 0
+                if (!string.IsNullOrEmpty(_currAttack.AnimationState))
+                    _animator.CrossFadeInFixedTime("Idle", 0.1f);
+
                 _currAttack = null;
             }
             else
@@ -83,6 +90,16 @@ public class PlayerAttack : MonoBehaviour
             else if (button2) StartAttack(_attack2Data);
             else if (button1) StartAttack(_attack1Data);
         }
+
+        UpdateAnimation();
+    }
+
+    // Attack states don't play on their own, every tick sets exactly where in the clip they should be
+    private void UpdateAnimation()
+    {
+        if (_currAttack == null || string.IsNullOrEmpty(_currAttack.AnimationState)) return;
+
+        _animator.Play(_currAttack.AnimationState, 0, _currAttack.GetAnimationTime(_currFrame));
     }
 
     private void StartAttack(AttackData attack)

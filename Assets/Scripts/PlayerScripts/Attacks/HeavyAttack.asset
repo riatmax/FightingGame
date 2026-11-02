@@ -23,5 +23,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 186e20ac3d97d854195fc7ab7d51b8a6, type: 3}
     - {fileID: 8300000, guid: 05cb007c489dd954c8dcab00936401f2, type: 3}
     volume: 1
+  animationState: Chibi_Rig_Heavy
+  animationStrikePoint: 1
   HitboxOffset: {x: 1, y: 1}
   HitboxSize: {x: 1.5, y: 0.6}
