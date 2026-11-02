@@ -15,12 +15,5 @@ MonoBehaviour:
   startupFrames: 12
   activeFrames: 4
   recoveryFrames: 22
-  damage: 0
-  range: 0
-  sfxPlaylist:
-  - clips:
-    - {fileID: 8300000, guid: 42f4a7ea79a9a994fa13161932582e46, type: 3}
-    - {fileID: 8300000, guid: 186e20ac3d97d854195fc7ab7d51b8a6, type: 3}
-    - {fileID: 8300000, guid: 05cb007c489dd954c8dcab00936401f2, type: 3}
-    framesAfterStartup: 0
-    volume: 1
+  HitboxOffset: {x: 0.9, y: 1}
+  HitboxSize: {x: 1, y: 0.6}

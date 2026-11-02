@@ -19,10 +19,16 @@ public class PlayerAttack : MonoBehaviour
     private bool _button3Pending;
     private bool _debugAttackPending;
 
+    private bool _hasHit;
+
     private AttackData _currAttack;
     private int _currFrame;
     private bool _currAttackHit;
     private AttackPhase _lastPhase; // for logging
+
+    private Fighter _fighter;
+
+    public AttackData CurrentAttack => _currAttack;
 
     private void Awake()
     {
@@ -33,6 +39,8 @@ public class PlayerAttack : MonoBehaviour
         _button3Action = _thisPlayerInput.actions[InputManager.button3];
 
         _currAttack = null;
+
+        _fighter = GetComponent<Fighter>();
     }
 
     private void Update()
@@ -101,6 +109,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void StartAttack(AttackData attack)
     {
+        _hasHit = false;
         _currAttack = attack;
         _currFrame = 0;
         _currAttackHit = false;
@@ -109,5 +118,27 @@ public class PlayerAttack : MonoBehaviour
 
         if (SFXManager.Instance != null)
             SFXManager.Instance.OnAttackFrame(attack, _currFrame);
+    }
+
+    public bool TryGetHitbox(out Rect box)
+    {
+        if (_currAttack != null && _currAttack.GetPhase(_currFrame) == AttackPhase.Active && !_hasHit)
+        {
+            Vector2 center = (Vector2)transform.position + new Vector2(_currAttack.HitboxOffset.x * _fighter.Facing, _currAttack.HitboxOffset.y);
+            box = new Rect(Vector2.zero, _currAttack.HitboxSize);
+            box.center = center;
+
+            return true;
+        }
+        else
+        {
+            box = default;
+            return false;
+        }
+    } 
+
+    public void MarkHit()
+    {
+        _hasHit = true;
     }
 }

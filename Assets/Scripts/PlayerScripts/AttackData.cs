@@ -49,6 +49,9 @@ public class AttackData : ScriptableObject
     [Tooltip("Leave empty to use the SFXManager's placeholder sound")]
     [SerializeField] private List<AttackSFX> sfxPlaylist = new List<AttackSFX>();
 
+    public Vector2 HitboxOffset;
+    public Vector2 HitboxSize;
+
     public int TotalFrames => startupFrames + activeFrames + recoveryFrames;
     public int StartupFrames => startupFrames;
     public int Damage => damage;
