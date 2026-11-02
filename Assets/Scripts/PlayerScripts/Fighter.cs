@@ -12,13 +12,14 @@ public class Fighter : MonoBehaviour
     [Tooltip("The character model, gets turned around whenever Facing changes")]
     [SerializeField] private Transform visualRoot;
     [Tooltip("Y rotation that makes the model look to the right")]
-    [SerializeField] private float facingRightYaw = 270f;
+    [SerializeField] private float facingRightYaw = 90f;
 
     [Header("--- Hurtbox ---")]
     [SerializeField] private Vector2 hurtboxOffset;
     [SerializeField] private Vector2 hurtboxSize;
 
     private PlayerInput _playerInput;
+    private Animator _animator;
     private int _facing = 1;
 
     public PlayerHealth Health { get; private set; }
@@ -51,7 +52,13 @@ public class Fighter : MonoBehaviour
         PlayerAttack = GetComponent<PlayerAttack>();
         PlayerMovement = GetComponent<PlayerMovement>();
         _playerInput = GetComponent<PlayerInput>();
+        _animator = GetComponentInChildren<Animator>();
         Health = GetComponent<PlayerHealth>();
+    }
+
+    private void Update()
+    {
+        _animator.SetBool("WalkingBack", IsBlocking);
     }
 
     public void Tick()
