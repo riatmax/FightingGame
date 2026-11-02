@@ -6,10 +6,16 @@ public class Fighter : MonoBehaviour
     public PlayerAttack PlayerAttack;
     public PlayerMovement PlayerMovement;
 
+    [SerializeField] private Renderer[] hatRenderers;
+
     [Header("--- Hurtbox ---")]
     [SerializeField] private Vector2 hurtboxOffset;
     [SerializeField] private Vector2 hurtboxSize;
 
+    private PlayerInput _playerInput;
+
+    public PlayerHealth Health { get; private set; }
+    public int PlayerIndex => _playerInput.playerIndex;
     public int Facing { get; set; } = 1;
 
     public Rect Hurtbox
@@ -27,19 +33,6 @@ public class Fighter : MonoBehaviour
     {
         PlayerAttack = GetComponent<PlayerAttack>();
         PlayerMovement = GetComponent<PlayerMovement>();
-    [SerializeField] private Renderer[] hatRenderers;
-
-    private PlayerAttack _playerAttack;
-    private PlayerMovement _playerMovement;
-    private PlayerInput _playerInput;
-
-    public PlayerHealth Health { get; private set; }
-    public int PlayerIndex => _playerInput.playerIndex;
-
-    private void Awake()
-    {
-        _playerAttack = GetComponent<PlayerAttack>();
-        _playerMovement = GetComponent<PlayerMovement>();
         _playerInput = GetComponent<PlayerInput>();
         Health = GetComponent<PlayerHealth>();
     }
@@ -73,7 +66,7 @@ public class Fighter : MonoBehaviour
 
     public void TryHit(Fighter target)
     {
-        if (_playerAttack.TryHit(target.transform.position, out int damage))
+        if (PlayerAttack.TryHit(target.transform.position, out int damage))
             target.Health.TakeDamage(damage);
     }
 
