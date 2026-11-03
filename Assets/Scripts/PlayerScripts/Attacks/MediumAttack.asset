@@ -16,6 +16,13 @@ MonoBehaviour:
   activeFrames: 3
   recoveryFrames: 14
   damage: 10
+  breaksBlock: 0
+  hitVFX: {fileID: 5685990813927353456, guid: ae5b18ebfccb9424d9fcffb2afb90282, type: 3}
+  hitVFXScale: 0.55
+  shakeForce: 0.085
+  hitstopFrames: 0
+  freezeTime: 0.1
+  playsStrikeArc: 0
   hitSFX:
     clips:
     - {fileID: 8300000, guid: 3c059cba63a8f084abb0c86a8e9dec1f, type: 3}
@@ -23,5 +30,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 20b765dfd164b2e408daa433c606f6c6, type: 3}
     - {fileID: 8300000, guid: c9fce3fe4a5272d4289b0e4ce3b4fe6d, type: 3}
     volume: 1
+  animationState: 
+  animationStrikePoint: 0.5
   HitboxOffset: {x: 1, y: 1}
   HitboxSize: {x: 1, y: 0.4}

@@ -23,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _canMove = true;
     private Rigidbody _playerRb;
     private float _footstepTimer;
+    private bool _frozen;
 
 
     
@@ -40,8 +41,19 @@ public class PlayerMovement : MonoBehaviour
     //     else _canMove = true;
     // }
     
+    public void SetFrozen(bool frozen)
+    {
+        _frozen = frozen;
+    }
+
     private void FixedUpdate()
     {
+        if (_frozen)
+        {
+            _playerRb.linearVelocity = Vector3.zero;
+            return;
+        }
+
         Vector2 input = _moveAction.IsPressed() ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
         Vector3 desiredVelocity = new Vector3(input.x * moveSpeed, 0f, 0f);
 
@@ -57,6 +69,11 @@ public class PlayerMovement : MonoBehaviour
     public bool IsWalkingBackward(int facing)
     {
         return _moveAction.ReadValue<Vector2>().x * facing < 0f;
+    }
+
+    public bool IsWalkingForward(int facing)
+    {
+        return _moveAction.ReadValue<Vector2>().x * facing > 0f;
     }
 
     private void UpdateFootsteps(bool isMoving)

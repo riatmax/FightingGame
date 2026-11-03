@@ -17,6 +17,12 @@ MonoBehaviour:
   recoveryFrames: 8
   damage: 5
   breaksBlock: 0
+  hitVFX: {fileID: 3347887276389172240, guid: 7a95a551d4e444f42bd0658421346636, type: 3}
+  hitVFXScale: 0.45
+  shakeForce: 0.04
+  hitstopFrames: 3
+  freezeTime: 0
+  playsStrikeArc: 0
   hitSFX:
     clips:
     - {fileID: 8300000, guid: 1a9a8258f9a6ec14095a9ddb8bcd1665, type: 3}
@@ -26,6 +32,6 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 7598b9f7a5eebcd4dbe134fae99d6ead, type: 3}
     volume: 1
   animationState: Chibi_Rig_Light
-  animationStrikePoint: 0.83
+  animationStrikePoint: 0.667
   HitboxOffset: {x: 1, y: 1}
   HitboxSize: {x: 0.8, y: 0.3}

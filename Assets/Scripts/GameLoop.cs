@@ -20,6 +20,7 @@ public class GameLoop : MonoBehaviour
 
     private readonly List<Fighter> _fighters = new List<Fighter>();
     private bool _roundStarted;
+    private int _hitstopTicks;
 
     public event Action<Fighter> RoundEnded; // Sends the winner, or null if it was a draw
 
@@ -29,6 +30,7 @@ public class GameLoop : MonoBehaviour
         public Fighter Attacker;
         public Fighter Defender;
         public AttackData Attack;
+        public Vector3 Point;
     }
 
     public void RegisterFighter(Fighter fighter)
@@ -69,6 +71,13 @@ public class GameLoop : MonoBehaviour
 
     private void Tick()
     {
+        if (_hitstopTicks > 0)
+        {
+            _hitstopTicks--;
+            if (_hitstopTicks == 0) SetFightersFrozen(false);
+            return;
+        }
+
         CurrentTick++;
 
         UpdateFacing();
@@ -109,15 +118,28 @@ public class GameLoop : MonoBehaviour
     private void CheckHit(Fighter attacker, Fighter defender)
     {
         if (!attacker.PlayerAttack.TryGetHitbox(out Rect hitbox)) return;
-        if (!hitbox.Overlaps(defender.Hurtbox)) return;
+        Rect hurtbox = defender.Hurtbox;
+        if (!hitbox.Overlaps(hurtbox)) return;
+
+        // Middle of where the boxes overlap, pulled towards the camera so effects aren't inside the body
+        float pointX = (Mathf.Max(hitbox.xMin, hurtbox.xMin) + Mathf.Min(hitbox.xMax, hurtbox.xMax)) / 2f;
+        float pointY = (Mathf.Max(hitbox.yMin, hurtbox.yMin) + Mathf.Min(hitbox.yMax, hurtbox.yMax)) / 2f;
 
         _hits.Add(new Hit
         {
             Attacker = attacker,
             Defender = defender,
-            Attack = attacker.PlayerAttack.CurrentAttack
+            Attack = attacker.PlayerAttack.CurrentAttack,
+            Point = new Vector3(pointX, pointY, defender.transform.position.z - 0.6f)
         });
     }
+
+    private void SetFightersFrozen(bool frozen)
+    {
+        foreach (Fighter fighter in _fighters)
+            fighter.SetFrozen(frozen);
+    }
+
     private void ApplyHits()
     {
         foreach (Hit hit in _hits)
@@ -129,14 +151,27 @@ public class GameLoop : MonoBehaviour
                 if (SFXManager.Instance != null)
                     SFXManager.Instance.PlayDefend();
 
+                if (HitEffects.Instance != null)
+                    HitEffects.Instance.PlayBlock(hit.Point, hit.Defender.transform.position);
+
                 Debug.Log(hit.Defender.name + " blocked " + hit.Attacker.name + "'s " + hit.Attack.name + ". Current Tick: " + CurrentTick);
                 continue;
             }
 
             hit.Defender.Health.TakeDamage(hit.Attack.Damage);
+            hit.Defender.FlashBody();
 
             if (SFXManager.Instance != null)
                 SFXManager.Instance.PlayAttackHit(hit.Attack);
+
+            if (HitEffects.Instance != null)
+                HitEffects.Instance.PlayHit(hit.Attack, hit.Point, hit.Attacker.Facing);
+
+            if (hit.Attack.HitstopFrames > _hitstopTicks)
+            {
+                _hitstopTicks = hit.Attack.HitstopFrames;
+                SetFightersFrozen(true);
+            }
 
             Debug.Log(hit.Attacker.name + " hit " + hit.Defender.name + " with " + hit.Attack.name + " for " + hit.Attack.Damage + ". Current Tick: " + CurrentTick);
         }
@@ -161,9 +196,14 @@ public class GameLoop : MonoBehaviour
         if (fightersLeft > 1) return;
 
         _roundStarted = false;
+        _hitstopTicks = 0;
+        SetFightersFrozen(false);
 
         foreach (Fighter fighter in _fighters)
             fighter.SetInputEnabled(false);
+
+        if (HitEffects.Instance != null)
+            HitEffects.Instance.PlayKO();
 
         RoundEnded?.Invoke(winner);
     }

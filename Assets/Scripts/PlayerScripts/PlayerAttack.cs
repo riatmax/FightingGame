@@ -13,6 +13,9 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private AttackData _attack2Data;
     [SerializeField] private AttackData _attack3Data;
 
+    [Tooltip("Trail on the fist that throws the first attack")]
+    [SerializeField] private TrailRenderer _attack1Trail;
+
     private bool _button1Pending;
     private bool _button2Pending;
     private bool _button3Pending;
@@ -20,6 +23,7 @@ public class PlayerAttack : MonoBehaviour
     private bool _hasHit;
 
     private AttackData _currAttack;
+    private TrailRenderer _currTrail;
     private int _currFrame;
     private AttackPhase _lastPhase; // for logging
 
@@ -63,9 +67,8 @@ public class PlayerAttack : MonoBehaviour
             {
                 Debug.Log(_currAttack.name + ": Finished currFrame " + _currFrame);
 
-                // Has to be fixed time - a normal CrossFade scales with the attack state's speed, which is 0
                 if (!string.IsNullOrEmpty(_currAttack.AnimationState))
-                    _animator.CrossFadeInFixedTime("Idle", 0.1f);
+                    _animator.Play("Idle");
 
                 _currAttack = null;
             }
@@ -80,6 +83,9 @@ public class PlayerAttack : MonoBehaviour
                     // Active frames are over, so this is the first moment we know the attack missed
                     if (phase == AttackPhase.Recovery && !_hasHit && SFXManager.Instance != null)
                         SFXManager.Instance.PlayAttackWhiff();
+
+                    if (phase == AttackPhase.Active && _currAttack.PlaysStrikeArc && HitEffects.Instance != null)
+                        HitEffects.Instance.PlayStrikeArc(_fighter.PlayerIndex, transform.position, _fighter.Facing);
                 }
             }
         }
@@ -92,6 +98,26 @@ public class PlayerAttack : MonoBehaviour
         }
 
         UpdateAnimation();
+        UpdateTrail();
+    }
+
+    // Trails run through the swing and cut off when recovery starts, then fade out on their own
+    private void UpdateTrail()
+    {
+        if (_currTrail == null) return;
+
+        _currTrail.emitting = _currAttack != null && _currAttack.GetPhase(_currFrame) != AttackPhase.Recovery;
+        if (!_currTrail.emitting) _currTrail = null;
+    }
+
+    public void SetTrailColor(Color color)
+    {
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new[] { new GradientColorKey(Color.Lerp(color, Color.white, 0.3f), 0f), new GradientColorKey(color, 0.5f) },
+            new[] { new GradientAlphaKey(0.85f, 0f), new GradientAlphaKey(0f, 1f) });
+
+        _attack1Trail.colorGradient = gradient;
     }
 
     // Attack states don't play on their own, every tick sets exactly where in the clip they should be
@@ -109,6 +135,8 @@ public class PlayerAttack : MonoBehaviour
         _currFrame = 0;
         _lastPhase = AttackPhase.Startup;
         Debug.Log(attack.name + ": Started, currFrame " + _currFrame);
+
+        _currTrail = attack == _attack1Data ? _attack1Trail : null;
     }
 
     // An attack can only hit once, on any of its active frames
