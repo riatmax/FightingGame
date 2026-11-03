@@ -62,8 +62,8 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
   m_Constraints: 124
   m_CollisionDetection: 2
 --- !u!136 &8182234219964422539
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  maxMove: 5
+  maxMove: 7.5
   footstepInterval: 0.3
 --- !u!114 &1556060156474411124
 MonoBehaviour:
@@ -187,6 +187,7 @@ MonoBehaviour:
   facingRightYaw: 90
   hurtboxOffset: {x: 0, y: 1}
   hurtboxSize: {x: 1, y: 2}
+  pushboxHalfWidth: 0.4
 --- !u!114 &7305980786623464194
 MonoBehaviour:
   m_ObjectHideFlags: 0

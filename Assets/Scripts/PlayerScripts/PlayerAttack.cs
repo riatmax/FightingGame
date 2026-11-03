@@ -53,7 +53,7 @@ public class PlayerAttack : MonoBehaviour
         if (_button3Action.WasPressedThisFrame()) _button3Pending = true;
     }
 
-    public void Tick()
+    public void Tick(bool canAct)
     {
         bool button1 = _button1Pending;
         bool button2 = _button2Pending;
@@ -67,8 +67,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 Debug.Log(_currAttack.name + ": Finished currFrame " + _currFrame);
 
-                if (!string.IsNullOrEmpty(_currAttack.AnimationState))
-                    _animator.Play("Idle");
+                ReturnToIdle();
 
                 _currAttack = null;
             }
@@ -90,7 +89,7 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        if (_currAttack == null)
+        if (_currAttack == null && canAct)
         {
             if (button3) StartAttack(_attack3Data);
             else if (button2) StartAttack(_attack2Data);
@@ -99,6 +98,12 @@ public class PlayerAttack : MonoBehaviour
 
         UpdateAnimation();
         UpdateTrail();
+    }
+
+    private void ReturnToIdle()
+    {
+        if (!string.IsNullOrEmpty(_currAttack.AnimationState))
+            _animator.Play("Idle");
     }
 
     // Trails run through the swing and cut off when recovery starts, then fade out on their own
@@ -167,5 +172,14 @@ public class PlayerAttack : MonoBehaviour
     public void MarkHit()
     {
         _hasHit = true;
+    }
+
+    public void CancelAttack()
+    {
+        if (_currAttack == null) return;
+        if (_currTrail != null) { _currTrail.emitting = false; _currTrail = null; }
+
+        ReturnToIdle();
+        _currAttack = null;
     }
 }

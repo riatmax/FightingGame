@@ -2,6 +2,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum FighterState
+{
+    Free,
+    Attacking,
+    Hitstun,
+    Blockstun,
+}
 public class Fighter : MonoBehaviour
 {
     public PlayerAttack PlayerAttack;
@@ -21,14 +28,46 @@ public class Fighter : MonoBehaviour
     [SerializeField] private Vector2 hurtboxOffset;
     [SerializeField] private Vector2 hurtboxSize;
 
+    [Header("--- Pushbox (simulated collision) ---")]
+    [SerializeField] private float pushboxHalfWidth = 0.4f;
+
     private PlayerInput _playerInput;
     private Animator _animator;
     private int _facing = 1;
     private Color _bodyColor;
+    private int _hitstunRemaining;
+    private int _blockstunRemaining;
+    private float _pushbackPerTick;
+    private int _pushbackTicksRemaining;
+
+    private const int PUSHBACK_TICKS = 6;
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
-    public bool IsBlocking => PlayerMovement.IsWalkingBackward(_facing);
+    public float PushboxHalfWidth => pushboxHalfWidth;
+
+    public bool IsBlocking
+    {
+        get
+        {
+            FighterState currState = CurrFighterState;
+
+            if (currState == FighterState.Blockstun) return true;
+            if (currState == FighterState.Free) return PlayerMovement.IsWalkingBackward(_facing);
+            else return false;
+        }
+    }
+
+    public FighterState CurrFighterState
+    {
+        get
+        {
+            if (_hitstunRemaining > 0) return FighterState.Hitstun;
+            if (_blockstunRemaining > 0) return FighterState.Blockstun;
+            if (PlayerAttack.CurrentAttack != null) return FighterState.Attacking;
+            else return FighterState.Free;
+        }
+    }
 
     public int Facing
     {
@@ -68,8 +107,16 @@ public class Fighter : MonoBehaviour
 
     public void Tick()
     {
-        PlayerAttack.Tick();
-        PlayerMovement.Tick();
+        bool stunned = _hitstunRemaining > 0 || _blockstunRemaining > 0;
+
+        if (_hitstunRemaining > 0) _hitstunRemaining--;
+        if (_blockstunRemaining > 0) _blockstunRemaining--;
+
+        PlayerAttack.Tick(!stunned);
+
+        bool canMove = !stunned && PlayerAttack.CurrentAttack == null;
+
+        PlayerMovement.Tick(canMove);
     }
 
     // Depth is only for the gizmo, hits are still checked in 2D. It has to be wider than the
@@ -132,7 +179,35 @@ public class Fighter : MonoBehaviour
     // Stops the model and movement for hitstop. Attacks freeze on their own because they run on ticks
     public void SetFrozen(bool frozen)
     {
-        _animator.speed = frozen ? 0f : 1f;
-        PlayerMovement.SetFrozen(frozen);
+        /*_animator.speed = frozen ? 0f : 1f;
+        PlayerMovement.SetFrozen(frozen);*/
+    }
+
+
+    public void ReceiveHit(AttackData attack, bool blocked)
+    {
+        if (blocked)
+        {
+            _blockstunRemaining = attack.BlockstunFrames;
+            return;
+        }
+
+        PlayerAttack.CancelAttack();
+        _blockstunRemaining = 0;
+        _hitstunRemaining = attack.HitstunFrames;
+    }
+
+    public void StartPushback(float distance)
+    {
+        _pushbackPerTick = distance / PUSHBACK_TICKS;
+        _pushbackTicksRemaining = PUSHBACK_TICKS;
+    }
+
+    public float ConsumePushbackStep()
+    {
+        if (_pushbackTicksRemaining <= 0) return 0;
+
+        _pushbackTicksRemaining--;
+        return _pushbackPerTick;
     }
 }

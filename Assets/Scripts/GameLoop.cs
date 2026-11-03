@@ -85,26 +85,57 @@ public class GameLoop : MonoBehaviour
         foreach (Fighter fighter in _fighters)
             fighter.Tick();
 
+        ApplyPushback();
+        ResolvePushboxes();
         DetectHits();
         ApplyHits();
     }
 
+    // Slides fighters that were hit or blocked. Whatever the stage edge stops, the other fighter takes instead
+    private void ApplyPushback()
+    {
+        if (_fighters.Count != 2) return;
+
+        PushFighter(_fighters[0], _fighters[1]);
+        PushFighter(_fighters[1], _fighters[0]);
+    }
+
+    private void PushFighter(Fighter fighter, Fighter other)
+    {
+        float step = fighter.ConsumePushbackStep();
+        if (step == 0f) return;
+
+        float limit = fighter.PlayerMovement.MaxMove;
+        float target = fighter.transform.position.x + step;
+        float clamped = Mathf.Clamp(target, -limit, limit);
+        SetFighterX(fighter, clamped);
+
+        float leftover = target - clamped;
+        if (leftover == 0f) return;
+
+        // Defender is against the edge, so the attacker slides back instead
+        float otherLimit = other.PlayerMovement.MaxMove;
+        float otherX = Mathf.Clamp(other.transform.position.x - leftover, -otherLimit, otherLimit);
+        SetFighterX(other, otherX);
+    }
+
+    // Fighters only turn around while free, so a swing or a hit reaction never flips mid-way
     private void UpdateFacing()
     {
-        if (_fighters.Count == 2)
-        {
-            float dx = _fighters[1].transform.position.x - _fighters[0].transform.position.x;
-            if (dx > 0)
-            {
-                _fighters[0].Facing = 1;
-                _fighters[1].Facing = -1;
-            }
-            if (dx < 0)
-            {
-                _fighters[0].Facing = -1;
-                _fighters[1].Facing = 1;
-            }
-        }
+        if (_fighters.Count != 2) return;
+
+        float dx = _fighters[1].transform.position.x - _fighters[0].transform.position.x;
+        if (dx == 0f) return;   // Exactly on top of each other, keep the old facing
+
+        int facing0 = dx > 0f ? 1 : -1;
+        SetFacingIfFree(_fighters[0], facing0);
+        SetFacingIfFree(_fighters[1], -facing0);
+    }
+
+    private static void SetFacingIfFree(Fighter fighter, int facing)
+    {
+        if (fighter.CurrFighterState == FighterState.Free)
+            fighter.Facing = facing;
     }
 
     private void DetectHits()
@@ -155,10 +186,14 @@ public class GameLoop : MonoBehaviour
                     HitEffects.Instance.PlayBlock(hit.Point, hit.Defender.transform.position);
 
                 Debug.Log(hit.Defender.name + " blocked " + hit.Attacker.name + "'s " + hit.Attack.name + ". Current Tick: " + CurrentTick);
+                hit.Defender.ReceiveHit(hit.Attack, true);
+                hit.Defender.StartPushback(hit.Attack.PushbackOnBlock * hit.Attacker.Facing);
                 continue;
             }
 
             hit.Defender.Health.TakeDamage(hit.Attack.Damage);
+            hit.Defender.ReceiveHit(hit.Attack, false);
+            hit.Defender.StartPushback(hit.Attack.PushbackOnHit * hit.Attacker.Facing);
             hit.Defender.FlashBody();
 
             if (SFXManager.Instance != null)
@@ -206,5 +241,53 @@ public class GameLoop : MonoBehaviour
             HitEffects.Instance.PlayKO();
 
         RoundEnded?.Invoke(winner);
+    }
+
+    private void ResolvePushboxes()
+    {
+        if (_fighters.Count != 2) return;
+
+        Fighter a = _fighters[0];
+        Fighter b = _fighters[1];
+
+        float aX = a.transform.position.x;
+        float bX = b.transform.position.x;
+
+        float dx = bX - aX;
+        float minDistance = a.PushboxHalfWidth + b.PushboxHalfWidth;
+        float overlap = minDistance - Mathf.Abs(dx);
+
+        if (overlap <= 0f) return;   // Not touching, nothing to do
+
+        // Which way A gets pushed: away from B. B always goes the opposite way
+        float aDirection;
+        if (dx > 0f) aDirection = -1f;          // B is to the right, so A goes left
+        else if (dx < 0f) aDirection = 1f;      // B is to the left, so A goes right
+        else aDirection = -a.Facing;            // Step 15: exactly on top of each other, back away from where A faces
+
+        float half = overlap / 2f;
+        float aTarget = aX + aDirection * half;
+        float bTarget = bX - aDirection * half;
+
+        // Step 14: whatever a fighter can't move because of the stage edge, the other one moves instead
+        float aLimit = a.PlayerMovement.MaxMove;
+        float bLimit = b.PlayerMovement.MaxMove;
+
+        float aClamped = Mathf.Clamp(aTarget, -aLimit, aLimit);
+        bTarget -= aTarget - aClamped;          // A's leftover goes to B, in B's direction
+
+        float bClamped = Mathf.Clamp(bTarget, -bLimit, bLimit);
+        aClamped -= bTarget - bClamped;         // And the other way round, if B hit the edge
+        aClamped = Mathf.Clamp(aClamped, -aLimit, aLimit);
+
+        SetFighterX(a, aClamped);
+        SetFighterX(b, bClamped);
+    }
+
+    private void SetFighterX(Fighter fighter, float x)
+    {
+        Vector3 position = fighter.transform.position;
+        position.x = x;
+        fighter.transform.position = position;
     }
 }
