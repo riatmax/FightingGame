@@ -85,6 +85,7 @@ public class GameLoop : MonoBehaviour
         foreach (Fighter fighter in _fighters)
             fighter.Tick();
 
+        ResolvePushboxes();
         DetectHits();
         ApplyHits();
     }
@@ -208,5 +209,53 @@ public class GameLoop : MonoBehaviour
             HitEffects.Instance.PlayKO();
 
         RoundEnded?.Invoke(winner);
+    }
+
+    private void ResolvePushboxes()
+    {
+        if (_fighters.Count != 2) return;
+
+        Fighter a = _fighters[0];
+        Fighter b = _fighters[1];
+
+        float aX = a.transform.position.x;
+        float bX = b.transform.position.x;
+
+        float dx = bX - aX;
+        float minDistance = a.PushboxHalfWidth + b.PushboxHalfWidth;
+        float overlap = minDistance - Mathf.Abs(dx);
+
+        if (overlap <= 0f) return;   // Not touching, nothing to do
+
+        // Which way A gets pushed: away from B. B always goes the opposite way
+        float aDirection;
+        if (dx > 0f) aDirection = -1f;          // B is to the right, so A goes left
+        else if (dx < 0f) aDirection = 1f;      // B is to the left, so A goes right
+        else aDirection = -a.Facing;            // Step 15: exactly on top of each other, back away from where A faces
+
+        float half = overlap / 2f;
+        float aTarget = aX + aDirection * half;
+        float bTarget = bX - aDirection * half;
+
+        // Step 14: whatever a fighter can't move because of the stage edge, the other one moves instead
+        float aLimit = a.PlayerMovement.MaxMove;
+        float bLimit = b.PlayerMovement.MaxMove;
+
+        float aClamped = Mathf.Clamp(aTarget, -aLimit, aLimit);
+        bTarget -= aTarget - aClamped;          // A's leftover goes to B, in B's direction
+
+        float bClamped = Mathf.Clamp(bTarget, -bLimit, bLimit);
+        aClamped -= bTarget - bClamped;         // And the other way round, if B hit the edge
+        aClamped = Mathf.Clamp(aClamped, -aLimit, aLimit);
+
+        SetFighterX(a, aClamped);
+        SetFighterX(b, bClamped);
+    }
+
+    private void SetFighterX(Fighter fighter, float x)
+    {
+        Vector3 position = fighter.transform.position;
+        position.x = x;
+        fighter.transform.position = position;
     }
 }

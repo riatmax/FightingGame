@@ -28,6 +28,9 @@ public class Fighter : MonoBehaviour
     [SerializeField] private Vector2 hurtboxOffset;
     [SerializeField] private Vector2 hurtboxSize;
 
+    [Header("--- Pushbox (simulated collision) ---")]
+    [SerializeField] private float pushboxHalfWidth = 0.4f;
+
     private PlayerInput _playerInput;
     private Animator _animator;
     private int _facing = 1;
@@ -37,7 +40,19 @@ public class Fighter : MonoBehaviour
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
-    public bool IsBlocking => PlayerMovement.IsWalkingBackward(_facing);
+    public float PushboxHalfWidth => pushboxHalfWidth;
+
+    public bool IsBlocking
+    {
+        get
+        {
+            FighterState currState = CurrFighterState;
+
+            if (currState == FighterState.Blockstun) return true;
+            if (currState == FighterState.Free) return PlayerMovement.IsWalkingBackward(_facing);
+            else return false;
+        }
+    }
 
     public FighterState CurrFighterState
     {
@@ -94,7 +109,10 @@ public class Fighter : MonoBehaviour
         if (_blockstunRemaining > 0) _blockstunRemaining--;
 
         PlayerAttack.Tick(!stunned);
-        PlayerMovement.Tick();
+
+        bool canMove = !stunned && PlayerAttack.CurrentAttack == null;
+
+        PlayerMovement.Tick(canMove);
     }
 
     // Depth is only for the gizmo, hits are still checked in 2D. It has to be wider than the
@@ -157,8 +175,8 @@ public class Fighter : MonoBehaviour
     // Stops the model and movement for hitstop. Attacks freeze on their own because they run on ticks
     public void SetFrozen(bool frozen)
     {
-        _animator.speed = frozen ? 0f : 1f;
-        PlayerMovement.SetFrozen(frozen);
+        /*_animator.speed = frozen ? 0f : 1f;
+        PlayerMovement.SetFrozen(frozen);*/
     }
 
 

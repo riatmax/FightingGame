@@ -24,8 +24,9 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _playerRb;
     private float _footstepTimer;
     private bool _frozen;
+    private float _moveX;
 
-
+    public float MaxMove => maxMove;
     
     private void Awake()
     {
@@ -46,34 +47,15 @@ public class PlayerMovement : MonoBehaviour
         _frozen = frozen;
     }
 
-    private void FixedUpdate()
-    {
-        if (_frozen)
-        {
-            _playerRb.linearVelocity = Vector3.zero;
-            return;
-        }
-
-        Vector2 input = _moveAction.IsPressed() ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
-        Vector3 desiredVelocity = new Vector3(input.x * moveSpeed, 0f, 0f);
-
-        if (_playerRb.position.x > maxMove && input.x > 0 || _playerRb.position.x < -maxMove && input.x < 0) desiredVelocity = Vector3.zero;
-        // if (!_canMove) desiredVelocity = Vector3.zero;
-
-        _playerRb.linearVelocity = desiredVelocity;
-
-        UpdateFootsteps(desiredVelocity.x != 0f);
-    }
-
     // Goes off the input, so backing into the edge of the stage still counts
     public bool IsWalkingBackward(int facing)
     {
-        return _moveAction.ReadValue<Vector2>().x * facing < 0f;
+        return _moveX * facing < 0f;
     }
 
     public bool IsWalkingForward(int facing)
     {
-        return _moveAction.ReadValue<Vector2>().x * facing > 0f;
+        return _moveX * facing > 0f;
     }
 
     private void UpdateFootsteps(bool isMoving)
@@ -84,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        _footstepTimer -= Time.fixedDeltaTime;
+        _footstepTimer -= 1f / GameLoop.TicksPerSecond;
         if (_footstepTimer > 0f) return;
 
         _footstepTimer = footstepInterval;
@@ -93,9 +75,20 @@ public class PlayerMovement : MonoBehaviour
             SFXManager.Instance.PlayFootstep();
     }
 
-    // Need to implement at some point, this will likely handle our movement
-    public void Tick()
+    public void Tick(bool canMove)
     {
+        _moveX = _moveAction.IsPressed() ? _moveAction.ReadValue<Vector2>().x : 0f;
 
+        Vector3 position = transform.position;
+        float startX = position.x;
+
+        if (canMove)
+        {
+            position.x += _moveX * moveSpeed / GameLoop.TicksPerSecond;
+            position.x = Mathf.Clamp(position.x, -maxMove, maxMove);
+            transform.position = position;
+        }
+
+        UpdateFootsteps(position.x != startX);
     }
 }
