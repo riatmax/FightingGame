@@ -85,9 +85,38 @@ public class GameLoop : MonoBehaviour
         foreach (Fighter fighter in _fighters)
             fighter.Tick();
 
+        ApplyPushback();
         ResolvePushboxes();
         DetectHits();
         ApplyHits();
+    }
+
+    // Slides fighters that were hit or blocked. Whatever the stage edge stops, the other fighter takes instead
+    private void ApplyPushback()
+    {
+        if (_fighters.Count != 2) return;
+
+        PushFighter(_fighters[0], _fighters[1]);
+        PushFighter(_fighters[1], _fighters[0]);
+    }
+
+    private void PushFighter(Fighter fighter, Fighter other)
+    {
+        float step = fighter.ConsumePushbackStep();
+        if (step == 0f) return;
+
+        float limit = fighter.PlayerMovement.MaxMove;
+        float target = fighter.transform.position.x + step;
+        float clamped = Mathf.Clamp(target, -limit, limit);
+        SetFighterX(fighter, clamped);
+
+        float leftover = target - clamped;
+        if (leftover == 0f) return;
+
+        // Defender is against the edge, so the attacker slides back instead
+        float otherLimit = other.PlayerMovement.MaxMove;
+        float otherX = Mathf.Clamp(other.transform.position.x - leftover, -otherLimit, otherLimit);
+        SetFighterX(other, otherX);
     }
 
     // Fighters only turn around while free, so a swing or a hit reaction never flips mid-way
@@ -158,11 +187,13 @@ public class GameLoop : MonoBehaviour
 
                 Debug.Log(hit.Defender.name + " blocked " + hit.Attacker.name + "'s " + hit.Attack.name + ". Current Tick: " + CurrentTick);
                 hit.Defender.ReceiveHit(hit.Attack, true);
+                hit.Defender.StartPushback(hit.Attack.PushbackOnBlock * hit.Attacker.Facing);
                 continue;
             }
 
             hit.Defender.Health.TakeDamage(hit.Attack.Damage);
             hit.Defender.ReceiveHit(hit.Attack, false);
+            hit.Defender.StartPushback(hit.Attack.PushbackOnHit * hit.Attacker.Facing);
             hit.Defender.FlashBody();
 
             if (SFXManager.Instance != null)

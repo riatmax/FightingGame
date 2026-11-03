@@ -37,6 +37,10 @@ public class Fighter : MonoBehaviour
     private Color _bodyColor;
     private int _hitstunRemaining;
     private int _blockstunRemaining;
+    private float _pushbackPerTick;
+    private int _pushbackTicksRemaining;
+
+    private const int PUSHBACK_TICKS = 6;
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
@@ -191,5 +195,19 @@ public class Fighter : MonoBehaviour
         PlayerAttack.CancelAttack();
         _blockstunRemaining = 0;
         _hitstunRemaining = attack.HitstunFrames;
+    }
+
+    public void StartPushback(float distance)
+    {
+        _pushbackPerTick = distance / PUSHBACK_TICKS;
+        _pushbackTicksRemaining = PUSHBACK_TICKS;
+    }
+
+    public float ConsumePushbackStep()
+    {
+        if (_pushbackTicksRemaining <= 0) return 0;
+
+        _pushbackTicksRemaining--;
+        return _pushbackPerTick;
     }
 }

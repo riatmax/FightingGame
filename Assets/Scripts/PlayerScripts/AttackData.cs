@@ -65,6 +65,8 @@ public class AttackData : ScriptableObject
     public string AnimationState => animationState;
     public int HitstunFrames => hitstunFrames;
     public int BlockstunFrames => blockstunFrames;
+    public float PushbackOnHit => pushbackOnHit;
+    public float PushbackOnBlock => pushbackOnHit;
 
     // Startup plays the clip up to the strike point and active + recovery plays the rest,
     // so the strike connects on the first active frame whatever the frame data is set to
