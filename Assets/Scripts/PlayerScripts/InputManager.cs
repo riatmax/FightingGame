@@ -8,4 +8,5 @@ public static class InputManager
     public static readonly String button1 = "Button 1";
     public static readonly String button2 = "Button 2";
     public static readonly String button3 = "Button 3";
+    public static readonly String quit = "Quit";
 }

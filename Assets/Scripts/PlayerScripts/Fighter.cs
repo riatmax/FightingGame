@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +7,9 @@ public class Fighter : MonoBehaviour
     public PlayerAttack PlayerAttack;
     public PlayerMovement PlayerMovement;
 
-    [SerializeField] private Renderer[] hatRenderers;
+    [SerializeField] private Renderer[] bodyRenderers;
+    [Tooltip("Seconds the body flashes white when hit")]
+    [SerializeField] private float hitFlashDuration = 0.08f;
 
     [Header("--- Model ---")]
     [Tooltip("The character model, gets turned around whenever Facing changes")]
@@ -21,6 +24,7 @@ public class Fighter : MonoBehaviour
     private PlayerInput _playerInput;
     private Animator _animator;
     private int _facing = 1;
+    private Color _bodyColor;
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
@@ -59,6 +63,7 @@ public class Fighter : MonoBehaviour
     private void Update()
     {
         _animator.SetBool("WalkingBack", IsBlocking);
+        _animator.SetBool("WalkingForward", PlayerMovement.IsWalkingForward(_facing));
     }
 
     public void Tick()
@@ -99,9 +104,35 @@ public class Fighter : MonoBehaviour
         else _playerInput.DeactivateInput();
     }
 
-    public void SetHatColor(Color color)
+    public void SetBodyColor(Color color)
     {
-        foreach (Renderer hatRenderer in hatRenderers)
-            hatRenderer.material.color = color;
+        _bodyColor = color;
+        ApplyBodyColor(color);
+    }
+
+    public void FlashBody()
+    {
+        StopAllCoroutines();
+        StartCoroutine(FlashRoutine());
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        ApplyBodyColor(Color.white);
+        yield return new WaitForSecondsRealtime(hitFlashDuration);
+        ApplyBodyColor(_bodyColor);
+    }
+
+    private void ApplyBodyColor(Color color)
+    {
+        foreach (Renderer bodyRenderer in bodyRenderers)
+            bodyRenderer.material.color = color;
+    }
+
+    // Stops the model and movement for hitstop. Attacks freeze on their own because they run on ticks
+    public void SetFrozen(bool frozen)
+    {
+        _animator.speed = frozen ? 0f : 1f;
+        PlayerMovement.SetFrozen(frozen);
     }
 }

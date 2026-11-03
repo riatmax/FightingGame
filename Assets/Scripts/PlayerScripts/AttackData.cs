@@ -21,6 +21,19 @@ public class AttackData : ScriptableObject
     [Tooltip("Goes straight through a block and hits anyway")]
     [SerializeField] private bool breaksBlock;
 
+    [Header("Hit Feel")]
+    [Tooltip("Plays where the attack connects")]
+    [SerializeField] private GameObject hitVFX;
+    [SerializeField] private float hitVFXScale = 0.5f;
+    [Tooltip("How hard the camera shakes when this attack hits")]
+    [SerializeField] private float shakeForce = 0.08f;
+    [Tooltip("Game frames the two fighters freeze for when this attack hits")]
+    [Min(0)] [SerializeField] private int hitstopFrames = 3;
+    [Tooltip("Real seconds the whole game freezes for when this attack hits - VFX, camera, everything")]
+    [Min(0f)] [SerializeField] private float freezeTime;
+    [Tooltip("Plays the attacker's strike arc swoosh as the active frames start")]
+    [SerializeField] private bool playsStrikeArc;
+
     [Header("Audio")]
     [Tooltip("Plays when this attack hits. A miss plays the SFXManager's whiff sound instead")]
     [SerializeField] private SFXGroup hitSFX = new SFXGroup();
@@ -38,6 +51,12 @@ public class AttackData : ScriptableObject
     public int TotalFrames => startupFrames + activeFrames + recoveryFrames;
     public int Damage => damage;
     public bool BreaksBlock => breaksBlock;
+    public GameObject HitVFX => hitVFX;
+    public float HitVFXScale => hitVFXScale;
+    public float ShakeForce => shakeForce;
+    public int HitstopFrames => hitstopFrames;
+    public float FreezeTime => freezeTime;
+    public bool PlaysStrikeArc => playsStrikeArc;
     public SFXGroup HitSFX => hitSFX;
     public string AnimationState => animationState;
 

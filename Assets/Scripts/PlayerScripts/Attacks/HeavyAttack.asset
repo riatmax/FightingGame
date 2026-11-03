@@ -17,6 +17,12 @@ MonoBehaviour:
   recoveryFrames: 22
   damage: 15
   breaksBlock: 1
+  hitVFX: {fileID: 5685990813927353456, guid: ae5b18ebfccb9424d9fcffb2afb90282, type: 3}
+  hitVFXScale: 0.55
+  shakeForce: 0.18
+  hitstopFrames: 0
+  freezeTime: 0.22
+  playsStrikeArc: 1
   hitSFX:
     clips:
     - {fileID: 8300000, guid: 42f4a7ea79a9a994fa13161932582e46, type: 3}

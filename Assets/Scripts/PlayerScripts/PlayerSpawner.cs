@@ -21,7 +21,7 @@ public class PlayerSpawner : MonoBehaviour
     [Header("--- Spawn Settings ---")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform[] spawnPoints;
-    [Tooltip("Hat and menu color for each player, in the same order as the control schemes")]
+    [Tooltip("Character and menu color for each player, in the same order as the control schemes")]
     [SerializeField] private Color[] playerColors;
     private InputActionAsset _controls;
     private PlayerInput[] _joinedPlayers;
@@ -96,7 +96,8 @@ public class PlayerSpawner : MonoBehaviour
         _targetGroup.AddMember(_joinedPlayers[schemeIndex].transform, 0.5f, 0.5f);
 
         Fighter fighter = player.GetComponent<Fighter>();
-        fighter.SetHatColor(playerColors[schemeIndex]);
+        fighter.SetBodyColor(playerColors[schemeIndex]);
+        fighter.PlayerAttack.SetTrailColor(playerColors[schemeIndex]);
         fighter.Facing = spawnPoints[schemeIndex].position.x > 0f ? -1 : 1; // Face the middle of the stage until the round starts tracking the other player
         _gameLoop.RegisterFighter(fighter);
 
