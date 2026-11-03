@@ -16,6 +16,8 @@ public class AttackData : ScriptableObject
     [SerializeField] private int recoveryFrames;
     [SerializeField] private int hitstunFrames;
     [SerializeField] private int blockstunFrames;
+    [SerializeField] private float pushbackOnHit;
+    [SerializeField] private float pushbackOnBlock;
 
     [Header("Damage")]
     [Tooltip("How much health this attack takes off when it hits")]

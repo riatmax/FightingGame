@@ -15,6 +15,10 @@ MonoBehaviour:
   startupFrames: 4
   activeFrames: 2
   recoveryFrames: 8
+  hitstunFrames: 13
+  blockstunFrames: 10
+  pushbackOnHit: 0.3
+  pushbackOnBlock: 0.4
   damage: 5
   breaksBlock: 0
   hitVFX: {fileID: 3347887276389172240, guid: 7a95a551d4e444f42bd0658421346636, type: 3}
