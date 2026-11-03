@@ -90,22 +90,23 @@ public class GameLoop : MonoBehaviour
         ApplyHits();
     }
 
+    // Fighters only turn around while free, so a swing or a hit reaction never flips mid-way
     private void UpdateFacing()
     {
-        if (_fighters.Count == 2)
-        {
-            float dx = _fighters[1].transform.position.x - _fighters[0].transform.position.x;
-            if (dx > 0)
-            {
-                _fighters[0].Facing = 1;
-                _fighters[1].Facing = -1;
-            }
-            if (dx < 0)
-            {
-                _fighters[0].Facing = -1;
-                _fighters[1].Facing = 1;
-            }
-        }
+        if (_fighters.Count != 2) return;
+
+        float dx = _fighters[1].transform.position.x - _fighters[0].transform.position.x;
+        if (dx == 0f) return;   // Exactly on top of each other, keep the old facing
+
+        int facing0 = dx > 0f ? 1 : -1;
+        SetFacingIfFree(_fighters[0], facing0);
+        SetFacingIfFree(_fighters[1], -facing0);
+    }
+
+    private static void SetFacingIfFree(Fighter fighter, int facing)
+    {
+        if (fighter.CurrFighterState == FighterState.Free)
+            fighter.Facing = facing;
     }
 
     private void DetectHits()
