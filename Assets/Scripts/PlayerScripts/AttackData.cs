@@ -14,6 +14,8 @@ public class AttackData : ScriptableObject
     [SerializeField] private int startupFrames;
     [SerializeField] private int activeFrames;
     [SerializeField] private int recoveryFrames;
+    [SerializeField] private int hitstunFrames;
+    [SerializeField] private int blockstunFrames;
 
     [Header("Damage")]
     [Tooltip("How much health this attack takes off when it hits")]
@@ -59,6 +61,8 @@ public class AttackData : ScriptableObject
     public bool PlaysStrikeArc => playsStrikeArc;
     public SFXGroup HitSFX => hitSFX;
     public string AnimationState => animationState;
+    public int HitstunFrames => hitstunFrames;
+    public int BlockstunFrames => blockstunFrames;
 
     // Startup plays the clip up to the strike point and active + recovery plays the rest,
     // so the strike connects on the first active frame whatever the frame data is set to

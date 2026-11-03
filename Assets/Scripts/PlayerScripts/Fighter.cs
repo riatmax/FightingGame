@@ -2,6 +2,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum FighterState
+{
+    Free,
+    Attacking,
+    Hitstun,
+    Blockstun,
+}
 public class Fighter : MonoBehaviour
 {
     public PlayerAttack PlayerAttack;
@@ -25,10 +32,23 @@ public class Fighter : MonoBehaviour
     private Animator _animator;
     private int _facing = 1;
     private Color _bodyColor;
+    private int _hitstunRemaining;
+    private int _blockstunRemaining;
 
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
     public bool IsBlocking => PlayerMovement.IsWalkingBackward(_facing);
+
+    public FighterState CurrFighterState
+    {
+        get
+        {
+            if (_hitstunRemaining > 0) return FighterState.Hitstun;
+            if (_blockstunRemaining > 0) return FighterState.Blockstun;
+            if (PlayerAttack.CurrentAttack != null) return FighterState.Attacking;
+            else return FighterState.Free;
+        }
+    }
 
     public int Facing
     {
@@ -68,7 +88,12 @@ public class Fighter : MonoBehaviour
 
     public void Tick()
     {
-        PlayerAttack.Tick();
+        bool stunned = _hitstunRemaining > 0 || _blockstunRemaining > 0;
+
+        if (_hitstunRemaining > 0) _hitstunRemaining--;
+        if (_blockstunRemaining > 0) _blockstunRemaining--;
+
+        PlayerAttack.Tick(!stunned);
         PlayerMovement.Tick();
     }
 
@@ -134,5 +159,19 @@ public class Fighter : MonoBehaviour
     {
         _animator.speed = frozen ? 0f : 1f;
         PlayerMovement.SetFrozen(frozen);
+    }
+
+
+    public void ReceiveHit(AttackData attack, bool blocked)
+    {
+        if (blocked)
+        {
+            _blockstunRemaining = attack.BlockstunFrames;
+            return;
+        }
+
+        PlayerAttack.CancelAttack();
+        _blockstunRemaining = 0;
+        _hitstunRemaining = attack.HitstunFrames;
     }
 }

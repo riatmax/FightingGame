@@ -155,10 +155,12 @@ public class GameLoop : MonoBehaviour
                     HitEffects.Instance.PlayBlock(hit.Point, hit.Defender.transform.position);
 
                 Debug.Log(hit.Defender.name + " blocked " + hit.Attacker.name + "'s " + hit.Attack.name + ". Current Tick: " + CurrentTick);
+                hit.Defender.ReceiveHit(hit.Attack, true);
                 continue;
             }
 
             hit.Defender.Health.TakeDamage(hit.Attack.Damage);
+            hit.Defender.ReceiveHit(hit.Attack, false);
             hit.Defender.FlashBody();
 
             if (SFXManager.Instance != null)
