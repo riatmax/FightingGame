@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerAttack : MonoBehaviour
 {
+    private const int InputBufferTicks = 8;   // How long an early press is remembered
+
     private PlayerInput _thisPlayerInput;
 
     private InputAction _button1Action;
@@ -19,6 +21,9 @@ public class PlayerAttack : MonoBehaviour
     private bool _button1Pending;
     private bool _button2Pending;
     private bool _button3Pending;
+
+    private AttackData _bufferedAttack;
+    private int _bufferTicksRemaining;
 
     private bool _hasHit;
 
@@ -40,8 +45,6 @@ public class PlayerAttack : MonoBehaviour
         _button2Action = _thisPlayerInput.actions[InputManager.button2];
         _button3Action = _thisPlayerInput.actions[InputManager.button3];
 
-        _currAttack = null;
-
         _fighter = GetComponent<Fighter>();
         _animator = GetComponentInChildren<Animator>();
     }
@@ -58,7 +61,7 @@ public class PlayerAttack : MonoBehaviour
         bool button1 = _button1Pending;
         bool button2 = _button2Pending;
         bool button3 = _button3Pending;
-        _button1Pending = _button2Pending = _button3Pending = false; // Apparently you can just do this and sets all the bools to false, crazy stuff
+        _button1Pending = _button2Pending = _button3Pending = false;
 
         if (_currAttack != null)
         {
@@ -66,9 +69,7 @@ public class PlayerAttack : MonoBehaviour
             if (_currFrame >= _currAttack.TotalFrames)
             {
                 Debug.Log(_currAttack.name + ": Finished currFrame " + _currFrame);
-
                 ReturnToIdle();
-
                 _currAttack = null;
             }
             else
@@ -89,21 +90,70 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        if (_currAttack == null && canAct)
+        AttackData pressed = GetPressedAttack(button1, button2, button3);
+
+        // A press is remembered for a few ticks, so it still comes out if it was slightly early
+        if (pressed != null)
         {
-            if (button3) StartAttack(_attack3Data);
-            else if (button2) StartAttack(_attack2Data);
-            else if (button1) StartAttack(_attack1Data);
+            _bufferedAttack = pressed;
+            _bufferTicksRemaining = InputBufferTicks;
         }
+        else if (_bufferTicksRemaining > 0)
+        {
+            _bufferTicksRemaining--;
+            if (_bufferTicksRemaining == 0) _bufferedAttack = null;
+        }
+
+        // Presses during stun are thrown away, not saved for after it
+        if (!canAct) ClearBuffer();
+
+        AttackData wanted = _bufferedAttack;
+
+        // Cancel: an attack that connected (hit or block) can be cut short by a higher tier one during its window
+        if (_currAttack != null && canAct && _hasHit && wanted != null
+            && _currAttack.IsInCancelWindow(_currFrame)
+            && wanted.CancelTier > _currAttack.CancelTier)
+        {
+            Debug.Log(_currAttack.name + ": Cancelled into " + wanted.name + " on currFrame " + _currFrame);
+            StopTrail();
+            if (string.IsNullOrEmpty(wanted.AnimationState)) ReturnToIdle();
+            StartAttack(wanted);
+        }
+
+        if (_currAttack == null && canAct && wanted != null)
+            StartAttack(wanted);
 
         UpdateAnimation();
         UpdateTrail();
+    }
+
+    // Heaviest pressed button wins when more than one lands on the same tick
+    private AttackData GetPressedAttack(bool button1, bool button2, bool button3)
+    {
+        if (button3) return _attack3Data;
+        if (button2) return _attack2Data;
+        if (button1) return _attack1Data;
+        return null;
+    }
+
+    private void ClearBuffer()
+    {
+        _bufferedAttack = null;
+        _bufferTicksRemaining = 0;
     }
 
     private void ReturnToIdle()
     {
         if (!string.IsNullOrEmpty(_currAttack.AnimationState))
             _animator.Play("Idle");
+    }
+
+    private void StopTrail()
+    {
+        if (_currTrail == null) return;
+
+        _currTrail.emitting = false;
+        _currTrail = null;
     }
 
     // Trails run through the swing and cut off when recovery starts, then fade out on their own
@@ -135,6 +185,8 @@ public class PlayerAttack : MonoBehaviour
 
     private void StartAttack(AttackData attack)
     {
+        ClearBuffer();   // The press that started this attack is used up
+
         _hasHit = false;
         _currAttack = attack;
         _currFrame = 0;
@@ -159,15 +211,12 @@ public class PlayerAttack : MonoBehaviour
             Vector2 center = (Vector2)transform.position + new Vector2(_currAttack.HitboxOffset.x * _fighter.Facing, _currAttack.HitboxOffset.y);
             box = new Rect(Vector2.zero, _currAttack.HitboxSize);
             box.center = center;
-
             return true;
         }
-        else
-        {
-            box = default;
-            return false;
-        }
-    } 
+
+        box = default;
+        return false;
+    }
 
     public void MarkHit()
     {
@@ -177,9 +226,16 @@ public class PlayerAttack : MonoBehaviour
     public void CancelAttack()
     {
         if (_currAttack == null) return;
-        if (_currTrail != null) { _currTrail.emitting = false; _currTrail = null; }
 
+        StopTrail();
         ReturnToIdle();
         _currAttack = null;
+    }
+
+    // Drops any presses waiting to be used, so nothing fires when input comes back on
+    public void ClearPendingInputs()
+    {
+        _button1Pending = _button2Pending = _button3Pending = false;
+        ClearBuffer();
     }
 }

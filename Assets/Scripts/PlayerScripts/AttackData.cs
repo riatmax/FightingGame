@@ -18,6 +18,9 @@ public class AttackData : ScriptableObject
     [SerializeField] private int blockstunFrames;
     [SerializeField] private float pushbackOnHit;
     [SerializeField] private float pushbackOnBlock;
+    [SerializeField] private int cancelTier;
+    [SerializeField] private int cancelWindowStart;
+    [SerializeField] private int cancelWindowEnd;
 
     [Header("Damage")]
     [Tooltip("How much health this attack takes off when it hits")]
@@ -66,7 +69,10 @@ public class AttackData : ScriptableObject
     public int HitstunFrames => hitstunFrames;
     public int BlockstunFrames => blockstunFrames;
     public float PushbackOnHit => pushbackOnHit;
-    public float PushbackOnBlock => pushbackOnHit;
+    public float PushbackOnBlock => pushbackOnHit; 
+    public int CancelTier => cancelTier;
+    public int CancelWindowStart => cancelWindowStart;
+    public int CancelWindowEnd => cancelWindowEnd;
 
     // Startup plays the clip up to the strike point and active + recovery plays the rest,
     // so the strike connects on the first active frame whatever the frame data is set to
@@ -87,5 +93,11 @@ public class AttackData : ScriptableObject
         else currAttackPhase = AttackPhase.Recovery;
 
         return currAttackPhase;
+    }
+
+    public bool IsInCancelWindow(int frame)
+    {
+        if (frame >= cancelWindowStart && frame <= cancelWindowEnd) return true;
+        return false;
     }
 }

@@ -19,6 +19,9 @@ MonoBehaviour:
   blockstunFrames: 10
   pushbackOnHit: 0.3
   pushbackOnBlock: 0.4
+  cancelTier: 0
+  cancelWindowStart: 4
+  cancelWindowEnd: 7
   damage: 5
   breaksBlock: 0
   hitVFX: {fileID: 3347887276389172240, guid: 7a95a551d4e444f42bd0658421346636, type: 3}
