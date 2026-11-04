@@ -69,7 +69,7 @@ public class AttackData : ScriptableObject
     public int HitstunFrames => hitstunFrames;
     public int BlockstunFrames => blockstunFrames;
     public float PushbackOnHit => pushbackOnHit;
-    public float PushbackOnBlock => pushbackOnHit; 
+    public float PushbackOnBlock => pushbackOnBlock;
     public int CancelTier => cancelTier;
     public int CancelWindowStart => cancelWindowStart;
     public int CancelWindowEnd => cancelWindowEnd;
