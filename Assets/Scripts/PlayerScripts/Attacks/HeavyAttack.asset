@@ -19,7 +19,7 @@ MonoBehaviour:
   blockstunFrames: 20
   pushbackOnHit: 0.8
   pushbackOnBlock: 0.6
-  cancelTier: 1
+  cancelTier: 2
   cancelWindowStart: 0
   cancelWindowEnd: 2
   damage: 15
