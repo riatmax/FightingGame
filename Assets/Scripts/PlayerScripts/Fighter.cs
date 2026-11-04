@@ -24,6 +24,8 @@ public class Fighter : MonoBehaviour
     [SerializeField] private Transform visualRoot;
     [Tooltip("Y rotation that makes the model look to the right")]
     [SerializeField] private float facingRightYaw = 90f;
+    [Tooltip("Animator state played while in the air. Attacks take over from it")]
+    [SerializeField] private string jumpAnimationState = "Chibi_Rig_Jump";
 
     [Header("--- Hurtbox ---")]
     [SerializeField] private Vector2 hurtboxOffset;
@@ -120,8 +122,22 @@ public class Fighter : MonoBehaviour
         PlayerAttack.Tick(!stunned && !PlayerMovement.IsDashing);
 
         bool canMove = !stunned && PlayerAttack.CurrentAttack == null;
+        bool wasGrounded = PlayerMovement.IsGrounded;
 
         PlayerMovement.Tick(canMove);
+
+        UpdateJumpAnimation(wasGrounded);
+    }
+
+    // Runs after the attack, so an attack always wins. Once an air attack ends the jump picks back up where the arc is
+    private void UpdateJumpAnimation(bool wasGrounded)
+    {
+        if (PlayerAttack.CurrentAttack != null) return;
+
+        if (!PlayerMovement.IsGrounded)
+            _animator.Play(jumpAnimationState, 0, PlayerMovement.JumpProgress);
+        else if (!wasGrounded)
+            _animator.Play("Idle");
     }
 
     // Depth is only for the gizmo, hits are still checked in 2D. It has to be wider than the

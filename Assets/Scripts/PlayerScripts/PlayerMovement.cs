@@ -47,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     private bool _grounded = true;
     private float _verticalVelocity;
     private float _jumpDirectionX;
+    private int _airTicks;
 
     private Fighter _fighter;
     private int _lastDir;
@@ -58,6 +59,9 @@ public class PlayerMovement : MonoBehaviour
     public float MaxMove => maxMove;
     public bool IsGrounded => _grounded;
     public bool IsDashing => _dashTicksRemaining > 0;
+
+    // 0 at takeoff, 1 on landing, so the jump animation can follow the arc
+    public float JumpProgress => Mathf.Clamp01(_airTicks / (2f * jumpVelocity / gravity * GameLoop.TicksPerSecond));
 
     private void Awake()
     {
@@ -127,6 +131,7 @@ public class PlayerMovement : MonoBehaviour
         if (_grounded && canMove && !IsDashing && input.y > 0.5f)
         {
             _grounded = false;
+            _airTicks = 0;
             _verticalVelocity = jumpVelocity;
             _jumpDirectionX = input.x > 0.3f ? 1f : input.x < -0.3f ? -1f : 0f;
         }
@@ -134,6 +139,7 @@ public class PlayerMovement : MonoBehaviour
         // The jump keeps going even when the player can't act, so being hit or attacking mid-air still falls
         if (!_grounded)
         {
+            _airTicks++;
             position.x += _jumpDirectionX * jumpHorizontalSpeed / GameLoop.TicksPerSecond;
             position.y += _verticalVelocity / GameLoop.TicksPerSecond;
             _verticalVelocity -= gravity / GameLoop.TicksPerSecond;
