@@ -122,12 +122,12 @@ public class MainMenu : MonoBehaviour
         countdownText.gameObject.SetActive(false);
     }
 
+    // Esc or space. Stops play mode in the editor and quits a build
     private void OnQuitPressed(InputAction.CallbackContext context)
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
 #endif
+        Application.Quit();
     }
 }
