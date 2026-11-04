@@ -250,6 +250,10 @@ public class GameLoop : MonoBehaviour
         Fighter a = _fighters[0];
         Fighter b = _fighters[1];
 
+        // One is high enough above the other to pass over them
+        float dy = Mathf.Abs(a.transform.position.y - b.transform.position.y);
+        if (dy >= (a.PushboxHeight + b.PushboxHeight) / 2f) return;
+
         float aX = a.transform.position.x;
         float bX = b.transform.position.x;
 

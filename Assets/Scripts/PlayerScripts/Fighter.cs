@@ -30,6 +30,8 @@ public class Fighter : MonoBehaviour
 
     [Header("--- Pushbox (simulated collision) ---")]
     [SerializeField] private float pushboxHalfWidth = 0.4f;
+    [Tooltip("Fighters further apart than this vertically don't push each other, so a jump can go over")]
+    [SerializeField] private float pushboxHeight = 1.8f;
 
     private PlayerInput _playerInput;
     private Animator _animator;
@@ -45,6 +47,7 @@ public class Fighter : MonoBehaviour
     public PlayerHealth Health { get; private set; }
     public int PlayerIndex => _playerInput.playerIndex;
     public float PushboxHalfWidth => pushboxHalfWidth;
+    public float PushboxHeight => pushboxHeight;
 
     public bool IsBlocking
     {
