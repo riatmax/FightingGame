@@ -147,6 +147,7 @@ public class Fighter : MonoBehaviour
 
     public void SetInputEnabled(bool inputEnabled)
     {
+        PlayerAttack.ClearPendingInputs();
         if (inputEnabled) _playerInput.ActivateInput();
         else _playerInput.DeactivateInput();
     }
