@@ -27,13 +27,32 @@ public class PlayerMovement : MonoBehaviour
     private float _moveX;
 
     public float MaxMove => maxMove;
-    
+
+    [Header("--- Dash ---")]
+    [SerializeField] private float forwardDashDistance = 1.5f;
+    [SerializeField] private float backDashDistance = 1.2f;
+    [Tooltip("Ticks the dash takes to cover its distance")]
+    [SerializeField] private int dashTicks = 12;
+    [Tooltip("Max ticks between the two taps of a double tap")]
+    [SerializeField] private int doubleTapWindow = 12;
+
+    private Fighter _fighter;
+    private int _lastDir;
+    private int _lastTapDir;
+    private int _ticksSinceTap = 999;
+    private float _dashStep;
+    private int _dashTicksRemaining;
+
+    public bool IsDashing => _dashTicksRemaining > 0;
+
     private void Awake()
     {
         _thisPlayerInput = GetComponent<PlayerInput>();
         _playerRb = GetComponent<Rigidbody>();
 
         _moveAction = _thisPlayerInput.actions[InputManager.move];
+
+        _fighter = GetComponent<Fighter>();
     }
 
     // private void OnCollisionEnter(Collision other)
@@ -75,20 +94,63 @@ public class PlayerMovement : MonoBehaviour
             SFXManager.Instance.PlayFootstep();
     }
 
+    // Runs once per game tick, from Fighter.Tick
     public void Tick(bool canMove)
     {
         _moveX = _moveAction.IsPressed() ? _moveAction.ReadValue<Vector2>().x : 0f;
 
+        // Taps are tracked every tick, but a dash only starts when the fighter is free
+        if (DetectDoubleTap(out int tapDir) && canMove && !IsDashing)
+            StartDash(tapDir);
+
         Vector3 position = transform.position;
         float startX = position.x;
 
-        if (canMove)
+        if (IsDashing)
+        {
+            position.x += _dashStep;
+            _dashTicksRemaining--;
+        }
+        else if (canMove)
         {
             position.x += _moveX * moveSpeed / GameLoop.TicksPerSecond;
-            position.x = Mathf.Clamp(position.x, -maxMove, maxMove);
-            transform.position = position;
         }
 
+        position.x = Mathf.Clamp(position.x, -maxMove, maxMove);
+        transform.position = position;
+
+        // Compared after the clamp, so pushing into the stage edge doesn't count as walking
         UpdateFootsteps(position.x != startX);
+    }
+
+    // A tap is the stick or key going into a direction it wasn't already in
+    private bool DetectDoubleTap(out int tapDir)
+    {
+        int dir = _moveX > 0.5f ? 1 : (_moveX < -0.5f ? -1 : 0);
+        bool tapped = dir != 0 && dir != _lastDir;
+        _lastDir = dir;
+        tapDir = dir;
+
+        if (_ticksSinceTap < 999) _ticksSinceTap++;
+        if (!tapped) return false;
+
+        bool isDouble = dir == _lastTapDir && _ticksSinceTap <= doubleTapWindow;
+
+        // A dash uses up both taps, so a triple tap doesn't dash twice
+        _lastTapDir = isDouble ? 0 : dir;
+        _ticksSinceTap = 0;
+        return isDouble;
+    }
+
+    private void StartDash(int dir)
+    {
+        float distance = dir == _fighter.Facing ? forwardDashDistance : backDashDistance;
+        _dashStep = dir * distance / dashTicks;
+        _dashTicksRemaining = dashTicks;
+    }
+
+    public void CancelDash()
+    {
+        _dashTicksRemaining = 0;
     }
 }

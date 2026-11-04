@@ -104,6 +104,10 @@ MonoBehaviour:
   moveSpeed: 5
   maxMove: 7.5
   footstepInterval: 0.3
+  forwardDashDistance: 1.75
+  backDashDistance: 1.4
+  dashTicks: 12
+  doubleTapWindow: 12
 --- !u!114 &1556060156474411124
 MonoBehaviour:
   m_ObjectHideFlags: 0
