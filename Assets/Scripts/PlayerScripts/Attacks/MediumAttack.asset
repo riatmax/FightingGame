@@ -37,7 +37,9 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 20b765dfd164b2e408daa433c606f6c6, type: 3}
     - {fileID: 8300000, guid: c9fce3fe4a5272d4289b0e4ce3b4fe6d, type: 3}
     volume: 1
-  animationState: 
-  animationStrikePoint: 0.5
+    basePitch: 1
+    pitchVariance: 0
+  animationState: Chibi_Rig_Spin_Kick
+  animationStrikePoint: 0.15
   HitboxOffset: {x: 1, y: 1}
   HitboxSize: {x: 1, y: 0.4}
