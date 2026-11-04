@@ -1721,7 +1721,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 95c4b9cde7cb95e4891d63eb4c417828, type: 3}
     volume: 1
     basePitch: 1
-    pitchVariance: 0.33
+    pitchVariance: 0
   playerHit:
     clips:
     - {fileID: 8300000, guid: ae9f0644a6e94624fae92d29a4cd5816, type: 3}
@@ -1729,7 +1729,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 88a28a04e6cb04a43b2d5257550106f8, type: 3}
     volume: 1
     basePitch: 1
-    pitchVariance: 0.33
+    pitchVariance: 0
   footstep:
     clips:
     - {fileID: 8300000, guid: fb93f4729cb4c0342b3771568bfc1930, type: 3}
@@ -1743,7 +1743,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: a17940513e541b648afcc02605675ed3, type: 3}
     volume: 1
     basePitch: 1
-    pitchVariance: 0.33
+    pitchVariance: 0
   defend:
     clips:
     - {fileID: 8300000, guid: 3111304235a82ff44ab207de65a4d72f, type: 3}
@@ -1753,7 +1753,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: fed93220fb4ffa64680831fcb3ee22ab, type: 3}
     volume: 1
     basePitch: 1
-    pitchVariance: 0.33
+    pitchVariance: 0
   voiceCount: 8
 --- !u!82 &780501305
 AudioSource:
@@ -3185,9 +3185,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 251877c539506984c93767aa76b3e575, type: 3}
   playOnStart: 1
   loopPlaylist: 1
-  shuffle: 1
-  volume: 0.1
-  crossfadeDuration: 1
+  shuffle: 0
+  volume: 0.5
+  crossfadeDuration: 2
   persistAcrossScenes: 0
 --- !u!1 &1296987618
 GameObject:
