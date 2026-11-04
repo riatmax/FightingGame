@@ -115,7 +115,7 @@
                     "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -126,7 +126,7 @@
                     "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -137,7 +137,7 @@
                     "path": "<Keyboard>/leftArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -148,7 +148,7 @@
                     "path": "<Keyboard>/rightArrow",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -170,7 +170,7 @@
                     "path": "<Keyboard>/t",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -181,7 +181,7 @@
                     "path": "<Keyboard>/g",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -192,7 +192,7 @@
                     "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -203,7 +203,7 @@
                     "path": "<Keyboard>/h",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -225,7 +225,7 @@
                     "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -236,7 +236,7 @@
                     "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -247,7 +247,7 @@
                     "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -258,7 +258,7 @@
                     "path": "<Keyboard>/l",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
@@ -280,7 +280,7 @@
                     "path": "<Keyboard>/b",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Button 1",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -291,7 +291,7 @@
                     "path": "<Keyboard>/4",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Button 1",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -302,7 +302,7 @@
                     "path": "<Keyboard>/7",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Button 1",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -324,7 +324,7 @@
                     "path": "<Keyboard>/n",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Button 2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -335,7 +335,7 @@
                     "path": "<Keyboard>/5",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Button 2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -346,7 +346,7 @@
                     "path": "<Keyboard>/8",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Button 2",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -368,7 +368,7 @@
                     "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P2",
+                    "groups": ";P1",
                     "action": "Button 3",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -379,7 +379,7 @@
                     "path": "<Keyboard>/6",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P3",
+                    "groups": ";P2",
                     "action": "Button 3",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -390,7 +390,7 @@
                     "path": "<Keyboard>/9",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";P4",
+                    "groups": ";P2",
                     "action": "Button 3",
                     "isComposite": false,
                     "isPartOfComposite": false
