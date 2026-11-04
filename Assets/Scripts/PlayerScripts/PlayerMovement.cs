@@ -9,10 +9,10 @@ public class PlayerMovement : MonoBehaviour
     ///     Handles the players movement
     /// 
     /// </summary>
-    
-    
-    
-    [Header("--- Movement Settings ---")] 
+
+
+
+    [Header("--- Movement Settings ---")]
     [SerializeField] private float moveSpeed;
     [Tooltip("How far left or right the player is allowed to move")]
     [SerializeField] private float maxMove;
@@ -28,21 +28,6 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Height of the floor the fighters stand on")]
     [SerializeField] private float groundHeight = 0f;
 
-    private PlayerInput _thisPlayerInput;
-    private InputAction _moveAction;
-    private bool _canMove = true;
-    private Rigidbody _playerRb;
-    private float _footstepTimer;
-    private bool _frozen;
-    private float _moveX;
-    private bool _grounded = true;
-    private float _verticalVelocity;
-    private float _jumpDirectionX;
-
-    public float MaxMove => maxMove;
-    public bool IsGrounded => _grounded;
-    
-
     [Header("--- Dash ---")]
     [SerializeField] private float forwardDashDistance = 1.5f;
     [SerializeField] private float backDashDistance = 1.2f;
@@ -51,6 +36,18 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Max ticks between the two taps of a double tap")]
     [SerializeField] private int doubleTapWindow = 12;
 
+    private PlayerInput _thisPlayerInput;
+    private InputAction _moveAction;
+    private bool _canMove = true;
+    private Rigidbody _playerRb;
+    private float _footstepTimer;
+    private bool _frozen;
+    private float _moveX;
+
+    private bool _grounded = true;
+    private float _verticalVelocity;
+    private float _jumpDirectionX;
+
     private Fighter _fighter;
     private int _lastDir;
     private int _lastTapDir;
@@ -58,6 +55,8 @@ public class PlayerMovement : MonoBehaviour
     private float _dashStep;
     private int _dashTicksRemaining;
 
+    public float MaxMove => maxMove;
+    public bool IsGrounded => _grounded;
     public bool IsDashing => _dashTicksRemaining > 0;
 
     private void Awake()
@@ -75,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
     //     if (other.collider.TryGetComponent(out PlayerMovement movement)) _canMove = false;
     //     else _canMove = true;
     // }
-    
+
     public void SetFrozen(bool frozen)
     {
         _frozen = frozen;
@@ -117,14 +116,15 @@ public class PlayerMovement : MonoBehaviour
         // Zero in the air, so a jumping player isn't blocking or playing a walk animation
         _moveX = _grounded ? input.x : 0f;
 
-        // Taps are tracked every tick, but a dash only starts when the fighter is free
-        if (DetectDoubleTap(out int tapDir) && canMove && !IsDashing)
+        // Taps are tracked every tick, but a dash only starts on the ground when the fighter is free
+        if (DetectDoubleTap(out int tapDir) && canMove && _grounded && !IsDashing)
             StartDash(tapDir);
 
         Vector3 position = transform.position;
         float startX = position.x;
 
-        if (_grounded && canMove && input.y > 0.5f)
+        // No jumping out of a dash, it has to finish first
+        if (_grounded && canMove && !IsDashing && input.y > 0.5f)
         {
             _grounded = false;
             _verticalVelocity = jumpVelocity;
@@ -146,7 +146,8 @@ public class PlayerMovement : MonoBehaviour
                 if (SFXManager.Instance != null)
                     SFXManager.Instance.PlayFootstep();
             }
-        if (IsDashing)
+        }
+        else if (IsDashing)
         {
             position.x += _dashStep;
             _dashTicksRemaining--;
@@ -159,9 +160,8 @@ public class PlayerMovement : MonoBehaviour
         position.x = Mathf.Clamp(position.x, -maxMove, maxMove);
         transform.position = position;
 
+        // Compared after the clamp, so pushing into the stage edge doesn't count as walking. No footsteps in the air
         UpdateFootsteps(_grounded && position.x != startX);
-        // Compared after the clamp, so pushing into the stage edge doesn't count as walking
-        UpdateFootsteps(position.x != startX);
     }
 
     // A tap is the stick or key going into a direction it wasn't already in
