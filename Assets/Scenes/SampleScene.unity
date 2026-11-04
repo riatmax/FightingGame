@@ -1720,12 +1720,16 @@ MonoBehaviour:
     - {fileID: 8300000, guid: b63c154df2aad9e4da7fdfe97ea62620, type: 3}
     - {fileID: 8300000, guid: 95c4b9cde7cb95e4891d63eb4c417828, type: 3}
     volume: 1
+    basePitch: 1
+    pitchVariance: 0.33
   playerHit:
     clips:
     - {fileID: 8300000, guid: ae9f0644a6e94624fae92d29a4cd5816, type: 3}
     - {fileID: 8300000, guid: cc34efde0a180c346a09f679184594b3, type: 3}
     - {fileID: 8300000, guid: 88a28a04e6cb04a43b2d5257550106f8, type: 3}
     volume: 1
+    basePitch: 1
+    pitchVariance: 0.33
   footstep:
     clips:
     - {fileID: 8300000, guid: fb93f4729cb4c0342b3771568bfc1930, type: 3}
@@ -1738,6 +1742,8 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 0aafd6808943d8244bf06d9fff081516, type: 3}
     - {fileID: 8300000, guid: a17940513e541b648afcc02605675ed3, type: 3}
     volume: 1
+    basePitch: 1
+    pitchVariance: 0.33
   defend:
     clips:
     - {fileID: 8300000, guid: 3111304235a82ff44ab207de65a4d72f, type: 3}
@@ -1746,6 +1752,9 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 7a7e8f90d84308542a782208b9151d64, type: 3}
     - {fileID: 8300000, guid: fed93220fb4ffa64680831fcb3ee22ab, type: 3}
     volume: 1
+    basePitch: 1
+    pitchVariance: 0.33
+  voiceCount: 8
 --- !u!82 &780501305
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3137,6 +3146,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1265888600}
+  - component: {fileID: 1265888601}
   m_Layer: 0
   m_Name: MusicManager
   m_TagString: Untagged
@@ -3159,6 +3169,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 826200185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1265888601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265888599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 173a2c16c42636d47b1e7d5450830077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tracks:
+  - {fileID: 8300000, guid: 251877c539506984c93767aa76b3e575, type: 3}
+  playOnStart: 1
+  loopPlaylist: 1
+  shuffle: 1
+  volume: 0.1
+  crossfadeDuration: 1
+  persistAcrossScenes: 0
 --- !u!1 &1296987618
 GameObject:
   m_ObjectHideFlags: 0

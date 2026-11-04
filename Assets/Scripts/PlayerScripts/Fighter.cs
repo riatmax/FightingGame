@@ -8,6 +8,7 @@ public enum FighterState
     Attacking,
     Hitstun,
     Blockstun,
+    Dashing
 }
 public class Fighter : MonoBehaviour
 {
@@ -68,6 +69,7 @@ public class Fighter : MonoBehaviour
             if (_hitstunRemaining > 0) return FighterState.Hitstun;
             if (_blockstunRemaining > 0) return FighterState.Blockstun;
             if (PlayerAttack.CurrentAttack != null) return FighterState.Attacking;
+            if (PlayerMovement.IsDashing) return FighterState.Dashing;
             else return FighterState.Free;
         }
     }
@@ -115,7 +117,7 @@ public class Fighter : MonoBehaviour
         if (_hitstunRemaining > 0) _hitstunRemaining--;
         if (_blockstunRemaining > 0) _blockstunRemaining--;
 
-        PlayerAttack.Tick(!stunned);
+        PlayerAttack.Tick(!stunned && !PlayerMovement.IsDashing);
 
         bool canMove = !stunned && PlayerAttack.CurrentAttack == null;
 
@@ -195,7 +197,7 @@ public class Fighter : MonoBehaviour
             _blockstunRemaining = attack.BlockstunFrames;
             return;
         }
-
+        PlayerMovement.CancelDash();
         PlayerAttack.CancelAttack();
         _blockstunRemaining = 0;
         _hitstunRemaining = attack.HitstunFrames;

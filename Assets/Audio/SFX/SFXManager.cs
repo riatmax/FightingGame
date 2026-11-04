@@ -7,6 +7,11 @@ public class SFXGroup
     public AudioClip[] clips;
     [Range(0f, 1f)] public float volume = 1f;
 
+    [Tooltip("Pitch the sound is centered on. 1 = normal, below 1 = deeper, above 1 = higher")]
+    [Range(0.5f, 2f)] public float basePitch = 1f;
+    [Tooltip("Total pitch spread around the base pitch. 0 = no variation, 0.2 = +/-0.1 around the base pitch")]
+    [Range(0f, 1f)] public float pitchVariance = 0f;
+
     [System.NonSerialized] private int _lastIndex = -1;
 
     public AudioClip GetRandomClip()
@@ -23,19 +28,25 @@ public class SFXGroup
         _lastIndex = index;
         return clips[index];
     }
+
+    public float GetRandomPitch()
+    {
+        float half = pitchVariance * 0.5f;
+        return Mathf.Max(0.1f, basePitch + Random.Range(-half, half));
+    }
 }
 
-[RequireComponent(typeof(AudioSource))]
 public class SFXManager : MonoBehaviour
 {
     /// <summary>
     ///
     ///     Plays every sound effect in the game. Each attack holds its own hit sound in its AttackData,
-    ///     everything shared between attacks lives here
+    ///     everything shared between attacks lives here.
+    ///
+    ///     Sounds play through a small pool of AudioSources so each one can have its own pitch
+    ///     without affecting sounds that are already playing.
     ///
     /// </summary>
-
-
 
     public static SFXManager Instance { get; private set; }
 
@@ -48,7 +59,12 @@ public class SFXManager : MonoBehaviour
     [Tooltip("Plays instead of the hit sounds when a player blocks an attack")]
     [SerializeField] private SFXGroup defend = new SFXGroup();
 
-    private AudioSource audioSource;
+    [Header("--- Settings ---")]
+    [Tooltip("How many sounds can play at the same time")]
+    [Min(1)] [SerializeField] private int voiceCount = 8;
+
+    private AudioSource[] _voices;
+    private int _nextVoice;
 
     private void Awake()
     {
@@ -59,9 +75,14 @@ public class SFXManager : MonoBehaviour
         }
         Instance = this;
 
-        audioSource = GetComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 0f;
+        _voices = new AudioSource[voiceCount];
+        for (int i = 0; i < voiceCount; i++)
+        {
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.spatialBlend = 0f; // 2D sound
+            _voices[i] = source;
+        }
     }
 
     public void PlayAttackHit(AttackData attack)
@@ -87,9 +108,27 @@ public class SFXManager : MonoBehaviour
 
     private void Play(SFXGroup group)
     {
+        if (group == null) return;
+
         AudioClip clip = group.GetRandomClip();
         if (clip == null) return;
 
-        audioSource.PlayOneShot(clip, group.volume);
+        AudioSource voice = GetFreeVoice();
+        voice.clip = clip;
+        voice.volume = group.volume;
+        voice.pitch = group.GetRandomPitch();
+        voice.Play();
+    }
+
+    private AudioSource GetFreeVoice()
+    {
+        // Prefer a source that isn't playing anything
+        foreach (AudioSource voice in _voices)
+            if (!voice.isPlaying) return voice;
+
+        // All busy: cut off the next one in rotation
+        AudioSource stolen = _voices[_nextVoice];
+        _nextVoice = (_nextVoice + 1) % _voices.Length;
+        return stolen;
     }
 }
