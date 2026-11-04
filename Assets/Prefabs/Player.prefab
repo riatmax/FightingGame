@@ -104,8 +104,12 @@ MonoBehaviour:
   moveSpeed: 5
   maxMove: 7.5
   footstepInterval: 0.3
-  forwardDashDistance: 1.75
-  backDashDistance: 1.4
+  jumpVelocity: 13
+  jumpHorizontalSpeed: 5
+  gravity: 40
+  groundHeight: 0
+  forwardDashDistance: 1.85
+  backDashDistance: 1.6
   dashTicks: 12
   doubleTapWindow: 12
 --- !u!114 &1556060156474411124
@@ -192,6 +196,7 @@ MonoBehaviour:
   hurtboxOffset: {x: 0, y: 1}
   hurtboxSize: {x: 1, y: 2}
   pushboxHalfWidth: 0.4
+  pushboxHeight: 1.8
 --- !u!114 &7305980786623464194
 MonoBehaviour:
   m_ObjectHideFlags: 0
